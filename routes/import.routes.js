@@ -1,7 +1,7 @@
 const fileImport = require("../controllers/import.controller.js");
 const { authJwt } = require("../middlewares");
 const multer =  require('multer');
-const upload = multer( { dest : '/api/upload' } );
+const upload = multer( { dest : './api/upload' } );
 
 module.exports = app => {
 
