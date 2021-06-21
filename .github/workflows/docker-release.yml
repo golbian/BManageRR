@@ -9,7 +9,7 @@ jobs:
       fail-fast: true
       max-parallel: 1
       matrix:
-        image: [golbian/managerr-back]
+        image: [managerr-back]
 
     steps:
       - uses: actions/checkout@v2
