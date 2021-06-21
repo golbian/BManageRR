@@ -1,3 +1,3 @@
-module.exports = {
-    secret: "manageRR-secret-key"
-  };
+// module.exports = {
+//     secret: process.env.SECRET
+//   };

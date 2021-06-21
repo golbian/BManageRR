@@ -1,4 +1,5 @@
-const config = require("../config/auth.config");
+// const config = require("../config/auth.config");
+const secret = process.env.SECRET_KEY;
 const db = require("../models");
 const User = db.user;
 const Role = db.role;
@@ -89,7 +90,7 @@ exports.signin = (req, res) => {
         });
       }
 
-      var token = jwt.sign({ id: user.id }, config.secret, {
+      var token = jwt.sign({ id: user.id }, secret, {
         expiresIn: 86400 // 24 hours
       });
 

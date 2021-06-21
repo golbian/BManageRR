@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const config = require("../config/auth.config.js");
+// const config = require("../config/auth.config.js");
 const db = require("../models");
 const User = db.user;
 const Role = db.role;
@@ -11,7 +11,7 @@ verifyToken = (req, res, next) => {
     return res.status(403).send({ message: "No token provided!" });
   }
 
-  jwt.verify(token, config.secret, (err, decoded) => {
+  jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
     if (err) {
       return res.status(401).send({ message: "Unauthorized!" });
     }
@@ -69,13 +69,7 @@ isAuthorized = (req, res, next) => {
         }
 
         for (let i = 0; i < roles.length; i++) {
-          if (roles[i].name === "pm") {
-            next();
-            return;
-          } else if (roles[i].name === "kam") {
-            next();
-            return;
-          } else if (roles[i].name === "admin") {
+          if (roles[i].name === "pm" || roles[i].name === "kam" || roles[i].name === "admin") {
             next();
             return;
           }

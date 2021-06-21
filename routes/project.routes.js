@@ -5,10 +5,10 @@ module.exports = app => {
     var router = require("express").Router();
   
     // Create a new Project
-    router.post("/",[authJwt.verifyToken, authJwt.isAuthorized], projects.create);
+    router.post("/",[authJwt.verifyToken, authJwt.isPm], projects.create);
   
     // Retrieve all Projects
-    router.get("/", [authJwt.verifyToken, authJwt.isAuthorized], projects.findAll);
+    router.get("/", [authJwt.verifyToken, authJwt.isPm], projects.findAll);
   
     // Retrieve all published Projects
     router.get("/published",[authJwt.verifyToken], projects.findAllPublished);
@@ -26,13 +26,13 @@ module.exports = app => {
     router.get("/:id",[authJwt.verifyToken], projects.findOne);
   
     // Update a Project with id
-    router.put("/:id",[authJwt.verifyToken, authJwt.isAuthorized], projects.update);
+    router.put("/:id",[authJwt.verifyToken, authJwt.isPm], projects.update);
 
     //Attach a Project Manager to a Project with id
-    router.put("/user/:user",[authJwt.verifyToken, authJwt.isAuthorized], projects.attachPM)
+    router.put("/user/:user",[authJwt.verifyToken, authJwt.isPm], projects.attachPM)
   
     // Delete a Project with id
-    router.delete("/:id",[authJwt.verifyToken, authJwt.isAuthorized], projects.delete);
+    router.delete("/:id",[authJwt.verifyToken, authJwt.isPm], projects.delete);
   
     app.use('/api/projects', router);
   };

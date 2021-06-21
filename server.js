@@ -1,3 +1,4 @@
+require('dotenv').config({ path: "./.env" });
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
@@ -8,7 +9,7 @@ const app = express();
 const db = require("./models");
 const Role = db.role;
 db.mongoose
-  .connect("mongodb://localhost:27017/manage_rr", {
+  .connect(process.env.DB, {
     useNewUrlParser: true,
     useUnifiedTopology: true
   })
@@ -131,7 +132,7 @@ function initial() {
 }
 
 // set port, listen for requests
-const PORT = process.env.PORT_SERVER || 8080
+const PORT = process.env.PORT_SERVER
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });
