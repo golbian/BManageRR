@@ -6,7 +6,7 @@ on:
 
 jobs:
   publish:
-    runs-on: node:current-alpine
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: true
       max-parallel: 1
