@@ -17,7 +17,7 @@ jobs:
         uses: crazy-max/ghaction-docker-meta@v3
         with:
           # list of Docker images to use as base name for tags
-          images: golbian/managerr-back
+          image: golbian/managerr-back
           # generate Docker tags based on the following events/attributes
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
