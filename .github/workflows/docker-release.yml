@@ -1,8 +1,6 @@
 name: Docker Release
 
-on:
-  release:
-    types: [published]
+on: [push]
 
 jobs:
   publish:
