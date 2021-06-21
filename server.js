@@ -8,8 +8,9 @@ const multer =  require('multer');
 const app = express();
 const db = require("./models");
 const Role = db.role;
+const url = 'mongodb://'+process.env.DB_USER +':'+ process.env.DB_PASSWORD +'@'+ process.env.MONGO_CONNECTION_URL+"/"+ process.env.DB_NAME;
 db.mongoose
-  .connect(process.env.DB, {
+  .connect(url, {
     useNewUrlParser: true,
     useUnifiedTopology: true
   })
