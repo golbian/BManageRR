@@ -51,6 +51,43 @@ isAdmin = (req, res, next) => {
   });
 };
 
+isAuthorized = (req, res, next) => {
+  User.findById(req.userId).exec((err, user) => {
+    if (err) {
+      res.status(500).send({ message: err });
+      return;
+    }
+
+    Role.find(
+      {
+        _id: { $in: user.roles }
+      },
+      (err, roles) => {
+        if (err) {
+          res.status(500).send({ message: err });
+          return;
+        }
+
+        for (let i = 0; i < roles.length; i++) {
+          if (roles[i].name === "pm") {
+            next();
+            return;
+          } else if (roles[i].name === "kam") {
+            next();
+            return;
+          } else if (roles[i].name === "admin") {
+            next();
+            return;
+          }
+        }
+
+        res.status(403).send({ message: "Required Role!" });
+        return;
+      }
+    );
+  });
+};
+
 isPm = (req, res, next) => {
   User.findById(req.userId).exec((err, user) => {
     if (err) {
@@ -152,5 +189,6 @@ const authJwt = {
   isModerator,
   isKam,
   isPm,
+  isAuthorized
 };
 module.exports = authJwt;
