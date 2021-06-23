@@ -5,6 +5,8 @@ ENV USER=managerr
 ENV UID=12345
 ENV GID=12345
 
+EXPOSE 8080/tcp
+
 # Create app directory
 WORKDIR /usr/src/managerr
 
