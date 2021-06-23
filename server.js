@@ -24,7 +24,7 @@ db.mongoose
   });
 
 var corsOptions = {
-  origin: "https://localhost:8081"
+  origin: "https://"+ process.env.URL +":8081"
 };
 
 app.use(cors(corsOptions));
