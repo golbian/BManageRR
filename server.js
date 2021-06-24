@@ -50,6 +50,10 @@ require('./routes/event.routes')(app);
 require('./routes/link.routes')(app);
 require('./routes/import.routes')(app);
 
+app.route('/*').get(function(req, res) { 
+  return res.sendFile(path.join(__dirname, 'public/index.html')); 
+});
+
 function initial() {
   Role.estimatedDocumentCount((err, count) => {
     if (!err && count === 0) {
