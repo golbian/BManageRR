@@ -3,6 +3,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const multer =  require('multer');
+var path = require('path');
 const upload = multer( { dest : './api/upload' } );
 
 const app = express();
