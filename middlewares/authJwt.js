@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-// const config = require("../config/auth.config.js");
+//const config = require("../config/auth.config.js");
 const db = require("../models");
 const User = db.user;
 const Role = db.role;
@@ -7,10 +7,12 @@ const Role = db.role;
 verifyToken = (req, res, next) => {
   let token = req.headers["x-access-token"];
 
+  /*check if a token exist*/
   if (!token) {
     return res.status(403).send({ message: "No token provided!" });
   }
 
+  /*checks the validity of the user token*/
   jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
     if (err) {
       return res.status(401).send({ message: "Unauthorized!" });
@@ -19,7 +21,7 @@ verifyToken = (req, res, next) => {
     next();
   });
 };
-
+/*check if the user has the role admin to acess to data*/
 isAdmin = (req, res, next) => {
   User.findById(req.userId).exec((err, user) => {
     if (err) {
@@ -51,6 +53,7 @@ isAdmin = (req, res, next) => {
   });
 };
 
+/*check if the user has a role to acess or not to data*/
 isAuthorized = (req, res, next) => {
   User.findById(req.userId).exec((err, user) => {
     if (err) {
@@ -82,6 +85,7 @@ isAuthorized = (req, res, next) => {
   });
 };
 
+/*check if the user has the role Pm to acess to data*/
 isPm = (req, res, next) => {
   User.findById(req.userId).exec((err, user) => {
     if (err) {
@@ -106,13 +110,14 @@ isPm = (req, res, next) => {
           }
         }
 
-        res.status(403).send({ message: "Require Pm Role!" });
+        res.status(403).send({ message: "Require 'pm' Role!" });
         return;
       }
     );
   });
 };
 
+/*check if the user has the role Kam to acess to data*/
 isKam = (req, res, next) => {
   User.findById(req.userId).exec((err, user) => {
     if (err) {
@@ -137,14 +142,14 @@ isKam = (req, res, next) => {
           }
         }
 
-        res.status(403).send({ message: "Require Kam Role!" });
+        res.status(403).send({ message: "Require 'kam' Role!" });
         return;
       }
     );
   });
 };
 
-
+/*check if the user has the role moderator to acess to data*/
 isModerator = (req, res, next) => {
   User.findById(req.userId).exec((err, user) => {
     if (err) {
@@ -170,7 +175,7 @@ isModerator = (req, res, next) => {
           }
         }
 
-        res.status(403).send({ message: "Require Moderator Role!" });
+        res.status(403).send({ message: "Require 'moderator' Role!" });
         return;
       }
     );

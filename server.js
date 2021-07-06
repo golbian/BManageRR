@@ -93,7 +93,7 @@ function initial() {
           console.log("error", err);
         }
 
-        console.log("added 'moderator' to roles collection");
+        console.log("added 'pm' to roles collection");
       });
 
       new Role({
@@ -112,7 +112,7 @@ function initial() {
           console.log("error", err);
         }
 
-        console.log("added 'admin' to roles collection");
+        console.log("added 'kam' to roles collection");
       });
 
       new Role({
