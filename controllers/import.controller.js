@@ -3,48 +3,60 @@ const mongoose = require("mongoose");
 const csv = require('csvtojson');
 const Project = db.project;
 const moment =  require("moment");
-// const mongodb = require("mongodb").MongoClient;
 
 exports.upload =  (req, res) => {
   if (req.file == undefined) {
     return res.status(400).send({ message: "Please upload a file!" });
   }
+  
 
   csv({
-    trim: true,
+    // trim: true,
     // ignoreEmpty: true,
-    delimiter: ","
+    delimiter: ";"
   })
   .fromFile(req.file.path, {defaultEncoding: 'UTF8'})
   .then((file)=>{
     var projects = [];
   // var schedules = [];
 
-  var pushToProject = function(parentWbs, schedule) {
-    console.log(parentWbs)
-    for(const project of projects) {
-      if(project.wbs === parentWbs) {
+  var pushToProject = function(parentWbs, schedule, task) {
+      if(!task) {
+        console.log(parentWbs)
+        const project = projects.find(p => p.wbs === parentWbs);
         schedule.parent = project._id
         project.schedules.push(schedule);
+      } else {
+        const project = projects.find(p => p.wbs === parentWbs.substr(0,7));
+        const wp = project.schedules.find(w => w.wbs === parentWbs);
+        schedule.parent = wp._id;
+        project.schedules.push(schedule);
       }
-    }
   }
 
   for( const item of file ) {
     var data = {
       wbs: item["REFERENCE"],
-      type: item["NIVEAU"],
+      wp: item["WP"],
+      type: "",
+      level: item["NIVEAU"],
       name: item["Designation"],
       client: item["Client"],
       contact: item["Contact"],
       country: item["Country"],
       stage: item["STAGE"],
+      creation: item["CREATION"],
       kam: item["KAM"],
       pm: item["PM"],
+      maj: item["MAJ"],
       temp: item["TEMP"],
       domaine: item["DOMAINE"],
+      offre: item["OFFRE"],
+      lien: item["LIEN"],
+      lien: item["LIEN_OFFRE"],
       cmde: item["CMDE"],
       cmde_link: item["LIEN_CMDE"],
+      x: item["x"],
       bl: item["BL"],
       bl_chrono: item["CHRONO_BL"],
       facture: item["FACTURE"],
@@ -71,12 +83,12 @@ exports.upload =  (req, res) => {
     data.start_date = moment(data.start_date, 'DD-MM-YYYY').format('YYYY-MM-DD[T00:00:00.000Z]');
     data.end_date = moment(data.end_date, 'DD-MM-YYYY').format('YYYY-MM-DD[T00:00:00.000Z]');
     data.end_date_revised = moment(data.end_date_revised, 'DD-MM-YYYY').format('YYYY-MM-DD[T00:00:00.000Z]');
-
     for(var i in data) {
       if(data[i] == undefined) {
         data[i] = "";
-      }   
+      }
     }
+
     let regex = new RegExp(/([A-Z])\w+/g)
     var wbsExtractDate = data.wbs.match(regex)
     var parts = wbsExtractDate;
@@ -90,11 +102,16 @@ exports.upload =  (req, res) => {
           data.type = 'project'
           data.schedules = []
           projects.push(data)
-        } else {
-          data.type = 'task';
+        } else if(data.nestedLevel !== 0 && data.level === "WP"){
+          data._id = new mongoose.mongo.ObjectId();
+          data.type = 'project';
           parts.pop()
-          data.parent= parts.join('.')
-          pushToProject(data.parent, data)
+          var parent = parts[0];
+          pushToProject(parent, data, false)
+        } else if(data.nestedLevel !== 0 && data.level === "TASK"){
+          data.type = 'task';
+          var parent = parts.join(".");
+          pushToProject(parent, data, true)
         }
       }
     }
@@ -121,14 +138,14 @@ exports.upload =  (req, res) => {
         }
       }
     }
-
   }
-  console.log(projects[77])
+
 
   // Save Project in the database
   Project
     .insertMany(projects)
     .then(data => {
+      // console.log(data)
       res.send(data);
     })
     .catch(err => {
