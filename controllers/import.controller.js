@@ -24,13 +24,19 @@ exports.upload =  (req, res) => {
       if(!task) {
         console.log(parentWbs)
         const project = projects.find(p => p.wbs === parentWbs);
+        const wp = project.schedules.find(w => w.wbs === parentWbs);
         schedule.parent = project._id
         project.schedules.push(schedule);
       } else {
         const project = projects.find(p => p.wbs === parentWbs.substr(0,7));
         const wp = project.schedules.find(w => w.wbs === parentWbs);
-        schedule.parent = wp._id;
-        project.schedules.push(schedule);
+        if(wp == undefined) {
+          schedule.parent = project._id
+          project.schedules.push(schedule);
+        } else {
+          schedule.parent = wp._id;
+          project.schedules.push(schedule);
+        }
       }
   }
 
@@ -89,28 +95,35 @@ exports.upload =  (req, res) => {
       }
     }
 
-    let regex = new RegExp(/([A-Z])\w+/g)
-    var wbsExtractDate = data.wbs.match(regex)
-    var parts = wbsExtractDate;
+    let regex = new RegExp(/([A-Z]+||[0-9])\w+/g)
+    var wbsExtract = data.wbs.match(regex)
+    var parts = wbsExtract;
     if(parts) {
       data.nestedLevel = parts.length -1;
-
       if(data.wbs || data.wbs !== "") {
         if(data.nestedLevel == 0) {
           data._id = new mongoose.mongo.ObjectId();
           // parentWbs = data.wbs
           data.type = 'project'
+          data.wp = false;
           data.schedules = []
           projects.push(data)
         } else if(data.nestedLevel !== 0 && data.level === "WP"){
           data._id = new mongoose.mongo.ObjectId();
           data.type = 'project';
+          data.wp = true;
           parts.pop()
           var parent = parts[0];
           pushToProject(parent, data, false)
         } else if(data.nestedLevel !== 0 && data.level === "TASK"){
           data.type = 'task';
-          var parent = parts.join(".");
+          var parent = parts[0] +'.'+ parts[1];
+          data.wp = false;
+          pushToProject(parent, data, true)
+        } else if(data.nestedLevel !== 0 && data.level === "DEL"){
+          data.type = 'milestone';
+          data.wp = false;
+          var parent = parts[0] +'.'+ parts[1];
           pushToProject(parent, data, true)
         }
       }
