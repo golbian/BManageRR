@@ -65,18 +65,18 @@ exports.create = (req, res) => {
 // Retrieve all Projects from the database.
 exports.findAll = (req, res) => {
 
-    if(getName(req.query.search) === "" && getClient(req.query.client) === "") {
-      var aggregation = [
-        { $addFields: { total: { $sum: "$schedules.charge" } } },
-        { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value)} }
-      ]
-    } else {
+    // if(getName(req.query.search) === "" && getClient(req.query.client) === "") {
+    //   var aggregation = [
+    //     { $addFields: { total: { $sum: "$schedules.charge" } } },
+    //     { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value)} }
+    //   ]
+    // } else {
       var aggregation = [
         { $match: { name: { $regex: getName(req.query.search) }, client: {$regex: getClient(req.query.client) } } },
         { $addFields: { total: { $sum: "$schedules.charge" } } },
         { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value)} }
       ]
-    }
+    // }
 
     Project.find().then(()=>{
       return Project.aggregate(aggregation).exec(function(err, data) {
@@ -109,6 +109,8 @@ if(err) {
   //     // })
   // // });
 };
+
+
 
 // Find a single Project with an id
 exports.findOne = (req, res) => {
@@ -191,7 +193,7 @@ exports.update = (req, res) => {
 // Delete a Project with the specified id in the request
 exports.delete = (req, res) => {
     const id = req.params.id;
-  
+
     Project.findOneAndDelete({_id : id}, { useFindAndModify: false })
       .then(data => {
         if (!data) {
@@ -246,15 +248,95 @@ exports.findAllPublished = (req, res) => {
       });
   };
 
+  exports.findAllPmForTimesheet = (req, res) => {
+    const pm = req.params.pm;
+    var aggregation = [
+      { $match:
+        { $and : [
+          { $or: [
+            {pm: pm},
+            {'schedules.pm': pm}
+          ]},
+        {$or: [{stage:'8. COMMANDE'}, {stage:'9. EN COURS'},{'schedules.$.stage':'8. COMMANDE'}, {'schedules.$.stage':'9. EN COURS'}] },
+      ]}
+      },
+      { $addFields: { total: { $sum: "$schedules.charge" } } },
+    ]
+    Project.find()
+    .then(()=>{
+      return Project.aggregate(aggregation).exec(function(err, data) {
+      if(err) {
+          res.status(500).send({
+            message:
+            err.message || "Some error occurred while retrieving projects."
+          });
+        } else {
+          res.send(data);
+        }
+      })
+    })
+  };
+
+  exports.findAllKamForTimesheet = (req, res) => {
+    const kam = req.params.kam;
+    var aggregation = [
+      { $match:
+        { $and : [
+          { $or: [
+            {kam: kam},
+            {'schedules.kam': kam}
+          ] },
+          {$or: [{stage:'8. COMMANDE'}, {stage:'9. EN COURS'}] },
+      ]}
+      },
+      { $addFields: { total: { $sum: "$schedules.charge" } } },
+    ]
+    Project.find()
+    .then(()=>{
+      return Project.aggregate(aggregation).exec(function(err, data) {
+      if(err) {
+          res.status(500).send({
+            message:
+            err.message || "Some error occurred while retrieving projects."
+          });
+        } else {
+          res.send(data);
+        }
+      })
+    })
+  };
+
+  exports.findAllUsersForTimesheet = (req, res) => {
+    const resource = req.params.resource;
+    var aggregation = [
+      { $match: { $and : [{"schedules.resources._id":resource}, {$or: [{stage:'8. COMMANDE'}, {stage:'9. EN COURS'},{'schedules.$.stage':'8. COMMANDE'}, {'schedules.$.stage':'9. EN COURS'}] } ]}},
+      { $addFields: { total: { $sum: "$schedules.charge" } } },
+  ]
+    Project.find()
+    .then(()=>{
+      return Project.aggregate(aggregation).exec(function(err, data) {
+      if(err) {
+          res.status(500).send({
+            message:
+            err.message || "Some error occurred while retrieving projects."
+          });
+        } else {
+          res.send(data);
+        }
+      })
+    })
+  };
+
   exports.findAllPmProject = (req, res) => {
     const pm = req.params.pm;
     if(getName(req.query.search) === "" && getClient(req.query.client) === "") {
       var aggregation = [
-        { $match: {$or: [
-          {pm: pm}, 
-          {'schedules.pm': pm}
-          ]} 
-        },  
+        { $match: 
+          { $or: [
+            {pm: pm}, 
+            {'schedules.pm': pm}
+          ]}
+        }, 
         { $addFields: { total: { $sum: "$schedules.charge" } } },
         { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value)} }
       ]
@@ -324,7 +406,6 @@ exports.findAllPublished = (req, res) => {
 
   exports.findAllResourceProject = (req, res) => {
     const resource = req.params.resource;
-
     if(getName(req.query.search) === "" && getClient(req.query.client) === "") {
       var aggregation = [
         { $match: { "schedules.resources._id":resource } },

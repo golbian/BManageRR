@@ -21,6 +21,15 @@ module.exports = app => {
 
     //Retrieve all Resource's projects
     router.get("/resource/:resource",[authJwt.verifyToken], projects.findAllResourceProject);
+
+    //Retrieve all Pm's projects for timesheet
+    router.get("/timesheet/pm/:pm",[authJwt.verifyToken, authJwt.isPm], projects.findAllPmForTimesheet);
+
+    //Retrieve all Kam's projects for timesheet
+    router.get("/timesheet/kam/:kam",[authJwt.verifyToken, authJwt.isKam], projects.findAllKamForTimesheet);
+
+    //Retrieve all Kam's projects for timesheet
+    router.get("/timesheet/resource/:resource",[authJwt.verifyToken], projects.findAllUsersForTimesheet);
   
     // Retrieve a single Project with id
     router.get("/:id",[authJwt.verifyToken], projects.findOne);

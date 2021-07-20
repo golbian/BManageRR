@@ -13,6 +13,13 @@ exports.create = (req, res) => {
 
   const event = new Event({
     name: req.body.name,
+    activity: req.body.activity,
+    projectWbs: req.body.projectWbs,
+    wpName: req.body.wpName,
+    wpWbs: req.body.wpWbs,
+    delWbs: req.body.delWbs,
+    wbs: req.body.wbs,
+    parentWp: req.body.parentWp,
     client: req.body.client,
     deliverable: req.body.deliverable,
     user: req.body.user,
@@ -24,10 +31,11 @@ exports.create = (req, res) => {
     schedule_id: req.body.schedule_id,
     start_date: req.body.start_date,
     end_date: req.body.end_date,
+    charge: req.body.charge,
     tps: req.body.tps,
     month: req.body.month,
     year: req.body.year,
-    duration: req.body.duration,
+    // duration: req.body.duration,
     insitu: req.body.insitu
   });
 
@@ -86,7 +94,7 @@ exports.findAllEventsPerMonth = (req, res) => {
         schedule_id: { $first: "$schedule_id"},
         start_date: { $first: "$start_date"},
         end_date: { $first: "$end_date"},
-        tps: { $first: "$tps"},
+        charge: { $first: "$charge"},
         duration: { $first: "$duration"},
         insitu: { $first: "$insitu"},
         month: { $first: "$month"},
@@ -246,12 +254,12 @@ exports.deleteAll = (req, res) => {
           schedule_id: { $first: "$schedule_id"},
           start_date: { $first: "$start_date"},
           end_date: { $first: "$end_date"},
-          tps: { $first: "$tps"},
+          charge: { $first: "$charge"},
           duration: { $first: "$duration"},
           insitu: { $first: "$insitu"},
           month: { $first: "$month"},
           year: { $first: "$year"},
-          pointage: { $sum: "$tps"},
+          pointage: { $sum: "$charge"},
           }
         }
     ]
@@ -328,12 +336,12 @@ exports.deleteAll = (req, res) => {
           schedule_id: { $first: "$schedule_id"},
           start_date: { $first: "$start_date"},
           end_date: { $first: "$end_date"},
-          tps: { $first: "$tps"},
+          charge: { $first: "$charge"},
           duration: { $first: "$duration"},
           insitu: { $first: "$insitu"},
           month: { $first: "$month"},
           year: { $first: "$year"},
-          pointage: { $sum: "$tps"},
+          pointage: { $sum: "$charge"},
           },
         }
     ]
@@ -408,12 +416,12 @@ exports.deleteAll = (req, res) => {
           schedule_id: { $first: "$schedule_id"},
           start_date: { $first: "$start_date"},
           end_date: { $first: "$end_date"},
-          tps: { $first: "$tps"},
+          charge: { $first: "$charge"},
           duration: { $first: "$duration"},
           insitu: { $first: "$insitu"},
           month: { $first: "$month"},
           year: { $first: "$year"},
-          pointage: { $sum: "$tps"},
+          pointage: { $sum: "$charge"},
           }
         }
     ]
