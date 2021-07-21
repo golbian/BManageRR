@@ -5,7 +5,7 @@ const Project = db.project;
 const moment =  require("moment");
 // const mongodb = require("mongodb").MongoClient;
 
-exports.upload =  (req, res) => {
+exports.upload = (req, res) => {
   if (req.file == undefined) {
     return res.status(400).send({ message: "Please upload a file!" });
   }
