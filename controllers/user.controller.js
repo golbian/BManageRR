@@ -25,6 +25,21 @@ exports.findAll = (req, res) => {
     });
 };
 
+exports.findSameUser = (req,res) => {
+  const name = req.params.usermane;
+  var condition = name ? { name: { $regex: new RegExp(name), $options: "i" } } : {};
+
+  User.find(condition)
+  .then(data => {
+    if (data){
+      res.status(404).send({ message: "Found User with the same name" });
+    }
+    else {
+      console.log("not find a same user")
+      res.send(data);
+    }
+  })
+}
 // Find a single User with an id
 exports.findOne = (req, res) => {
   const id = req.params.id;
@@ -55,25 +70,81 @@ exports.update = (req, res) => {
     });
   }
 
-  console.log(req.body)
-
   const id = req.params.id;
+  User.findOne({
+    username: req.body.username
+  }, (err, user) => {
+    if (err) {
+      res.status(500).send({ message: " ici error" });
+      return;
+    }
+    if (!user) {
+      User.findOne({
+        _id: id
+      }, (err, user) => {
+        if (err) {
+          res.status(500).send({ message: " ici error" });
+          return;
+        }
 
-  User.update({_id: id}, req.body, { useFindAndModify: false })
-    .then(data => {
-      console.log('data', data)
-      if (!data) {
-        res.status(404).send({
-          message: `Cannot update User with id=${id}. Maybe User was not found!`
+        if (!user) {
+          return res.status(404).send({ message: "User Not found." });
+        }
+        
+        var query = {username: req.body.username , email: req.body.email}
+        User.update({_id: user._id}, query, { useFindAndModify: false })
+        .then(data => {
+          if (!data) {
+            res.status(404).send({
+              message: `Cannot update User with id=${user._id}. Maybe User was not found!`
+            });
+          } else res.send({ message: "User was updated successfully." });
+        })
+        .catch(err => {
+          console.log(err);
+          res.status(500).send({
+            message: "Error updating User with id=" + id
+          });
         });
-      } else res.send({ message: "User was updated successfully." });
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).send({
-        message: "Error updating User with id=" + id
       });
-    });
+    }
+    else {
+      User.findOne({
+        _id: id
+      }, (err, user) => {
+        if (err) {
+          res.status(500).send({ message: " ici error" });
+          return;
+        }
+
+        if (!user) {
+          return res.status(404).send({ message: "User Not found." });
+        }
+        if(user.email !== req.body.email){
+          var query = {username: req.body.username , email: req.body.email}
+          User.update({_id: user._id}, query, { useFindAndModify: false })
+          .then(data => {
+            if (!data) {
+              res.status(404).send({
+                message: `Cannot update User with id=${user._id}. Maybe User was not found!`
+              });
+            } else res.send({ message: "User was updated successfully." });
+          })
+          .catch(err => {
+            console.log(err);
+            res.status(500).send({
+              message: "Error updating User with the username : " + req.body.username
+            });
+          });
+        }
+        else {
+          res.status(500).send({
+            message: "Error updating User with the username : " + req.body.username
+          });
+        }
+      });
+    }
+  })
 };
 
 // Update a User by admin with the id in the request
@@ -103,6 +174,7 @@ exports.updateByAdmin = (req, res) => {
         message: "Error updating User with id=" + id
       });
     });
+  
 };
 
 // Update a User pwd by the id in the request

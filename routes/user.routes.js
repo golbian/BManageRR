@@ -10,14 +10,14 @@ module.exports = app => {
   // Find a single user with id
   router.get("/:id", [authJwt.verifyToken], users.findOne);
 
-  // Update an User with id
-  router.put("/:id",[authJwt.verifyToken], users.update);
-
   // Update an User by admin with id
   router.put("/admin/:id",[authJwt.verifyToken, authJwt.isAdmin], users.updateByAdmin);
 
   // Update an User pwd with id
   router.put("/update-pwd/:id",[authJwt.verifyToken], users.updatePwd);
+
+  // Update an User with id
+  router.put("/update/:id",[authJwt.verifyToken], users.update);
 
   // Update an User with id
   router.put("/:id/:roleId",[authJwt.verifyToken, authJwt.isAdmin], users.pushRole);
