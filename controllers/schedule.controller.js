@@ -64,7 +64,7 @@ exports.findOne = (req, res) => {
       });
     }
   
-    const id = req.body.root;
+    const id = req.params.projectId;
     const scheduleId = req.body.id;
 
     Project.findOneAndUpdate(
@@ -78,6 +78,7 @@ exports.findOne = (req, res) => {
         "schedules.$.type": req.body.type, 
         "schedules.$.progress": req.body.progress,
         "schedules.$.end_date": req.body.end_date,
+        "schedules.$.end_date_revised": req.body.end_date_revised,
         "schedules.$.name": req.body.name,
         "schedules.$.contract": req.body.contract,
         "schedules.$.resources": req.body.resources,
@@ -86,6 +87,7 @@ exports.findOne = (req, res) => {
         "schedules.$.charge": req.body.charge,
         "schedules.$.pm": req.body.pm,
         "schedules.$.stage": req.body.stage,
+        "schedules.$.links": req.body.links,
         "schedules.$.etp": req.body.etp,
         "schedules.$.domaine": req.body.domaine,
         "schedules.$.ca": req.body.ca,

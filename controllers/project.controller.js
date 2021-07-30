@@ -73,7 +73,7 @@ exports.findAll = (req, res) => {
     // } else {
       var aggregation = [
         { $match: { name: { $regex: getName(req.query.search) }, client: {$regex: getClient(req.query.client) } } },
-        { $addFields: { total: { $sum: "$schedules.charge" } } },
+        { $addFields: { total: { $sum: "$schedules.charge" }, "schedules.root": "$$ROOT._id" } },
         { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value)} }
       ]
     // }

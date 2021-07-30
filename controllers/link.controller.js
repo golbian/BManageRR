@@ -46,20 +46,20 @@ exports.create = (req, res) => {
         "links.$.target": req.body.link.target,
         "links.$.type": req.body.link.type,
       },{ useFindAndModify: false }
-  )
-      .then(data => {
-        if (!data) {
-          res.status(404).send({
-            message: `Cannot update Link with id=${linkId} in Project with id=${id}. Maybe Link was not found!`
-          });
-        } else res.send({ message: "Link was updated successfully." });
-      })
-      .catch(err => {
-        console.log(err);
-        res.status(500).send({
-          message: "Error updating Link with id=" + id
+    )
+    .then(data => {
+      if (!data) {
+        res.status(404).send({
+          message: `Cannot update Link with id=${linkId} in Project with id=${id}. Maybe Link was not found!`
         });
+      } else res.send({ message: "Link was updated successfully." });
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).send({
+        message: "Error updating Link with id=" + id
       });
+    });
   };
 
   // Delete a Link with the specified id in the request
