@@ -19,7 +19,6 @@ exports.create = (req, res) => {
           message: `Cannot create Schedule. Maybe Project was not found!`
         });
       } else {
-
         try {
           res.status(200).send({
             tid: data.schedules.slice(-1)[0]._id,

@@ -35,17 +35,18 @@ module.exports = mongoose => {
     //     duration: mongoose.Schema.Types.Mixed,
     // });
 
-    var linkSchema = mongoose.Schema({
-        _id: String,
-        source: String,
-        target: String,
-        type: Number,
-    });
+    // var linkSchema = mongoose.Schema({
+    //     _id: mongoose.Schema.Types.ObjectId,
+    //     source: String,
+    //     target: String,
+    //     type: Number,
+    // });
     
     var taskSchema = mongoose.Schema({
+        _id: String,
         wbs: String,
         type: String,
-        wp: false,
+        wp: Boolean,
         name: String,
         client: String,
         contact: String,
@@ -81,13 +82,20 @@ module.exports = mongoose => {
         progress: Number,
         duration: mongoose.Schema.Types.Mixed,
         published: Boolean,
-        links: [linkSchema],
+        links: [
+            {
+              type: mongoose.Schema.Types.ObjectId,
+              ref: "link"
+            }
+        ],
     });
 
     var projectSchema = mongoose.Schema({
+        _id: String,
         wbs: String,
         type: String,
-        wp: false,
+        level: Number,
+        wp: Boolean,
         name: String,
         client: String,
         contact: String,
@@ -95,6 +103,7 @@ module.exports = mongoose => {
         stage: String,
         kam: String,
         pm : String,
+        resource: String,
         temp: String,
         domaine: String,
         cmde: String,
@@ -123,9 +132,10 @@ module.exports = mongoose => {
         progress: Number,
         duration: mongoose.Schema.Types.Mixed,
         published: Boolean,
-        links: [linkSchema],
         schedules: [taskSchema],
-    });
+    },
+    { timestamps: true }
+    );
 
     // Ensure virtual fields are serialised.
     projectSchema.set('toJSON', {

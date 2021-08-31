@@ -5,15 +5,15 @@ module.exports = app => {
   
     var router = require("express").Router();
 
-    //Create a new Schedule
-    router.post("/",[authJwt.verifyToken, authJwt.isAdmin], links.create);
+    //Create a new link
+    router.post("/:id",[authJwt.verifyToken], links.create);
 
     //Update link in a Project
 
-    router.put("/:id",[authJwt.verifyToken, authJwt.isAdmin], links.update);
+    router.put("/:id",[authJwt.verifyToken], links.update);
 
-    //Delete a Schedule with id
-    router.delete("/:projectId/LinkId",[authJwt.verifyToken, authJwt.isAdmin], links.delete);
+    //Delete a link with id
+    router.delete("/:id",[authJwt.verifyToken], links.delete);
   
     app.use('/api/link', router);
   };

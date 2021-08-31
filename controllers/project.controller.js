@@ -25,8 +25,8 @@ exports.create = (req, res) => {
   }
 
   const project = new Project({
-    // _id: req.body._id,
-    name: req.body.name,
+    _id: req.body._id,
+    name: req.body.text,
     type: req.body.type,
     client: req.body.client,
     contact: req.body.contact,
@@ -78,9 +78,14 @@ exports.findAll = (req, res) => {
       ]
     // }
 
-    Project.find().then(()=>{
-      return Project.aggregate(aggregation).exec(function(err, data) {
-if(err) {
+    Project.find()
+    .then(()=>{
+      return Project.aggregate(aggregation).exec(function(err, doc) {
+        Project.populate(doc, {
+          path: 'schedules.links',
+          populate: { path: 'links', model:"link" }
+        }, function(err, data) {
+          if(err) {
             res.status(500).send({
               message:
                 err.message || "Some error occurred while retrieving projects."
@@ -90,6 +95,8 @@ if(err) {
           }
         })
       })
+    })
+
 
   //     // exec(function(err, data) {
   //           /*Project.populate(doc , {
@@ -145,7 +152,7 @@ exports.update = (req, res) => {
   
     const id = req.params.id;
   
-    Project.findByIdAndUpdate(id, req.body, { useFindAndModify: false })
+    Project.updateOne({_id: id}, req.body, { useFindAndModify: false })
       .then(data => {
         if (!data) {
           res.status(404).send({
@@ -348,7 +355,12 @@ exports.findAllPublished = (req, res) => {
       ]
     }
 
-    Project.find().then(()=>{
+    Project.find()
+    .populate({
+      path: 'links',
+      populate: { path: 'project.links' }
+    })
+    .then(()=>{
       return Project.aggregate(aggregation).exec(function(err, data) {
       /*Project.populate(doc, {
         path: 'schedules.resources',
@@ -384,7 +396,12 @@ exports.findAllPublished = (req, res) => {
       ]
     }
 
-    Project.find().then(()=>{
+    Project.find()
+    .populate({
+      path: 'links',
+      populate: { path: 'project.links' }
+    })
+    .then(()=>{
       return Project.aggregate(aggregation).exec(function(err, data) {
       /*Project.populate(doc, {
         path: 'schedules.resources',
@@ -419,7 +436,11 @@ exports.findAllPublished = (req, res) => {
         { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value)} }
       ]
     }
-    Project.find().then(()=>{
+    Project.find().populate({
+      path: 'links',
+      populate: { path: 'project.links' }
+    })
+    .then(()=>{
       return Project.aggregate(aggregation).exec(function(err, data) {
       /*Project.populate(doc, {
         path: 'schedules.resources',
