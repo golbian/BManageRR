@@ -20,10 +20,7 @@ exports.create = (req, res) => {
         });
       } else {
         try {
-          res.status(200).send({
-            tid: data.schedules.slice(-1)[0]._id,
-            action:"inserted",
-          });
+          res.status(200).send(data);
         } catch {
           res.status(500).send({
             message: "Error creating Schedule"
