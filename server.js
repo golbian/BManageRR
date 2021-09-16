@@ -51,9 +51,9 @@ require('./routes/event.routes')(app);
 require('./routes/link.routes')(app);
 require('./routes/import.routes')(app);
 
-app.route('/*').get(function(req, res) {
-  return res.sendFile(path.join(__dirname, 'index.html')); 
-});
+// app.route('/*').get(function(req, res) {
+//   return res.sendFile(path.join(__dirname, 'index.html')); 
+// });
 
 function initial() {
   Role.estimatedDocumentCount((err, count) => {
