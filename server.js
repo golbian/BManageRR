@@ -1,15 +1,31 @@
 require('dotenv').config({ path: "./.env" });
 const express = require("express");
 const bodyParser = require("body-parser");
+const fs = require("fs");
 const cors = require("cors");
 const multer =  require('multer');
 var path = require('path');
 const upload = multer( { dest : './api/upload' } );
-
 const app = express();
 const db = require("./models");
 const Role = db.role;
 const url = 'mongodb://'+process.env.DB_USER +':'+ process.env.DB_PASSWORD +'@'+ process.env.MONGO_CONNECTION_URL+"/"+ process.env.DB_NAME;
+
+const server = require('https').createServer({
+  key: fs.readFileSync('./config/key.pem'),
+  cert: fs.readFileSync('./config/cert.pem')
+}, app);
+
+const io = require('socket.io')(server, {
+  allowEIO3: true,
+  cors: { 
+    origin: "https://localhost:8081",
+    methods: ["GET", "POST"], 
+    allowedHeaders: ["Access-Control-Allow-Origin"], 
+    credentials: true  
+  }
+});
+
 db.mongoose
   .connect(url, {
     useNewUrlParser: true,
@@ -25,8 +41,8 @@ db.mongoose
   });
 
 var corsOptions = {
-  origin: "https://"+ process.env.URL +":"+ process.env.PORT_VUE
-};
+    origin: "https://"+ process.env.URL +":"+ process.env.PORT_VUE
+  };
 
 app.use(cors(corsOptions));
 
@@ -139,6 +155,13 @@ function initial() {
 
 // set port, listen for requests
 const PORT = process.env.PORT_SERVER
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });
+
+io.on('connection', (socket) =>{
+  console.log(`Connecté au client ${socket.id}`)
+  socket.on('updateTask', data => {
+    console.log("HERE ===>", data)
+  })
+})

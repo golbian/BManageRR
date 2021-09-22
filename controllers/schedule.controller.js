@@ -60,8 +60,8 @@ exports.findOne = (req, res) => {
       });
     }
   
-    const id = req.params.projectId;
-    const scheduleId = req.body.id;
+    const id = req.body.root;
+    const scheduleId = req.body._id;
 
     Project.findOneAndUpdate(
        {_id: id, "schedules._id": scheduleId},
