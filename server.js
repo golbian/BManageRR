@@ -18,8 +18,8 @@ const server = require('https').createServer({
 
 const io = require('socket.io')(server, {
   allowEIO3: true,
-  cors: { 
-    origin: "https://localhost:8081",
+  cors: {
+    origin: "https://"+ process.env.URL +":"+ process.env.PORT_VUE,
     methods: ["GET", "POST"], 
     allowedHeaders: ["Access-Control-Allow-Origin"], 
     credentials: true  
@@ -161,7 +161,9 @@ server.listen(PORT, () => {
 
 io.on('connection', (socket) =>{
   console.log(`Connecté au client ${socket.id}`)
-  socket.on('updateTask', data => {
-    console.log("HERE ===>", data)
+  socket.on('ganttChange', data => {
+    console.log(data);
+    console.log("update task with id= "+ data +" in gantt")
+    socket.broadcast.emit('ganttUpdate')
   })
 })
