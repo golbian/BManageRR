@@ -67,10 +67,6 @@ require('./routes/event.routes')(app);
 require('./routes/link.routes')(app);
 require('./routes/import.routes')(app);
 
-// app.route('/*').get(function(req, res) {
-//   return res.sendFile(path.join(__dirname, 'index.html')); 
-// });
-
 function initial() {
   Role.estimatedDocumentCount((err, count) => {
     if (!err && count === 0) {
@@ -162,7 +158,6 @@ server.listen(PORT, () => {
 io.on('connection', (socket) =>{
   console.log(`Connecté au client ${socket.id}`)
   socket.on('ganttChange', data => {
-    console.log(data);
     console.log("update task with id= "+ data +" in gantt")
     socket.broadcast.emit('ganttUpdate')
   })
