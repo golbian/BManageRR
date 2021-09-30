@@ -2,6 +2,8 @@
 node_modules
 /dhtmlx
 /dist
+/config/cert.pem
+/config/key.pem
 
 # local env files
 .env
