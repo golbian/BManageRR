@@ -7,10 +7,6 @@ ENV GID=12345
 
 EXPOSE 8080/tcp
 
-RUN mkdir /etc/letsencrypt
-
-COPY /etc/letsencrypt/ /etc/letsencrypt/
-
 # Create app directory
 WORKDIR /usr/src/managerr
 
