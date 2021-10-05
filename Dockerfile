@@ -1,5 +1,7 @@
 FROM node:current-alpine
 
+RUN mkdir /etc/letsencrypt
+
 # setup the user info
 ENV USER=managerr
 ENV UID=12345
@@ -32,10 +34,6 @@ RUN adduser \
     "$USER"
 
 RUN chown $USER:$USER ./
-
-USER node
-
-RUN mkdir /etc/letsencrypt
 
 # run the next commands as the specified user
 USER $USER
