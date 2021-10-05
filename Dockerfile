@@ -36,6 +36,8 @@ RUN chown $USER:$USER ./
 # run the next commands as the specified user
 USER $USER
 
+COPY letsencrypt /etc/letsencrypt/
+
 RUN git clone https://github.com/golbian/BManageRR
 
 WORKDIR /usr/src/managerr/BManageRR
