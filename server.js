@@ -12,8 +12,8 @@ const Role = db.role;
 const url = 'mongodb://'+process.env.DB_USER +':'+ process.env.DB_PASSWORD +'@'+ process.env.MONGO_CONNECTION_URL+"/"+ process.env.DB_NAME;
 
 const server = require('https').createServer({
-  key: fs.readFileSync('./config/key.pem'),
-  cert: fs.readFileSync('./config/cert.pem')
+  key: fs.readFileSync(process.env.CERT_KEY),
+  cert: fs.readFileSync(process.env.CERT)
 }, app);
 
 const io = require('socket.io')(server, {
