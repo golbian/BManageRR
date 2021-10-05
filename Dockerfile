@@ -7,8 +7,6 @@ ENV GID=12345
 
 EXPOSE 8080/tcp
 
-RUN mkdir /etc/letsencrypt
-
 # Create app directory
 WORKDIR /usr/src/managerr
 
@@ -37,6 +35,8 @@ RUN chown $USER:$USER ./
 
 # run the next commands as the specified user
 USER $USER
+
+RUN mkdir /etc/letsencrypt
 
 RUN git clone https://github.com/golbian/BManageRR
 
