@@ -1,7 +1,5 @@
 FROM node:current-alpine
 
-RUN mkdir /etc/letsencrypt
-
 # setup the user info
 ENV USER=managerr
 ENV UID=12345
