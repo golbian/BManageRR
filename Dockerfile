@@ -7,8 +7,6 @@ ENV GID=12345
 
 EXPOSE 8080/tcp
 
-RUN --chown=node:node mkdir /etc/letsencrypt
-
 # Create app directory
 WORKDIR /usr/src/managerr
 
@@ -34,6 +32,10 @@ RUN adduser \
     "$USER"
 
 RUN chown $USER:$USER ./
+
+USER node
+
+RUN mkdir /etc/letsencrypt
 
 # run the next commands as the specified user
 USER $USER
