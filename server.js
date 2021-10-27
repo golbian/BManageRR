@@ -1,7 +1,6 @@
 require('dotenv').config({ path: "./.env" });
 const express = require("express");
 const bodyParser = require("body-parser");
-const fs = require("fs");
 const cors = require("cors");
 const multer =  require('multer');
 var path = require('path');
@@ -58,6 +57,9 @@ require("./routes/grid.routes")(app);
 require("./routes/auth.routes")(app);
 require('./routes/user.routes')(app);
 require('./routes/roles.routes')(app);
+require("./routes/client.routes")(app);
+require("./routes/function.routes")(app);
+require("./routes/skill.routes")(app);
 require('./routes/project.routes')(app);
 require('./routes/schedule.routes')(app);
 require('./routes/event.routes')(app);

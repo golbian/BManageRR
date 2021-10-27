@@ -96,15 +96,11 @@ exports.signin = (req, res) => {
 
       // var authorities = [];
 
-      Role.find({
-        // '_id': { $in: 
-        //     user.roles
-        // }
-        })
+      Role.find()
         .then(()=> {
             return User.populate(user , {
               path: 'roles',
-              populate: { path: 'roles' },
+              // populate: { path: 'roles' },
               select: "-_id"
             }, function(err, data) {
               if(!err) {
@@ -116,6 +112,8 @@ exports.signin = (req, res) => {
                   roles: user.roles,
                   sigle: user.sigle
                 });
+              } else {
+                console.log(err)
               }
           })
         })

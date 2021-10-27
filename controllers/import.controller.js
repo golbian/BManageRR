@@ -2,7 +2,11 @@ const db = require("../models");
 const mongoose = require("mongoose");
 const csv = require('csvtojson');
 const Project = db.project;
+const Client = db.client;
+const functionModel = db.function;
+const Skill = db.skill;
 const moment =  require("moment");
+const { v4: uuidv4 } = require('uuid');
 
 exports.upload =  (req, res) => {
   if (req.file == undefined) {
@@ -40,7 +44,30 @@ exports.upload =  (req, res) => {
       }
   }
 
+  const clients = []
+  const functions = []
+  const skills = []
+
   for( const item of file ) {
+
+    if(item["Client"] != '') {
+      if(clients.find(c => c == item["Client"]) === undefined) {
+        clients.push(item["Client"]);
+      }
+    }
+
+    if(item["FONCTION"] != '') {
+      if(functions.find(f => f == item["FONCTION"]) === undefined) {
+        functions.push(item["FONCTION"]);
+      }
+    }
+
+    if(item["COMPETENCE"] != '') {
+      if(skills.find(s => s == item["COMPETENCE"]) === undefined) {
+        skills.push(item["COMPETENCE"]);
+      }
+    }
+
     var data = {
       wbs: item["REFERENCE"],
       wp: item["WP"],
@@ -51,18 +78,20 @@ exports.upload =  (req, res) => {
       contact: item["Contact"],
       country: item["Country"],
       stage: item["STAGE"],
+      domaine: item["DOMAINE"],
+      mode: item["MODE"],
       creation: item["CREATION"],
       kam: item["KAM"],
       pm: item["PM"],
-      maj: item["MAJ"],
+      function: item["FONCTION"],
+      skill: item["COMPETENCE"],
+      resource: item["RESSOURCE"],
       temp: item["TEMP"],
-      domaine: item["DOMAINE"],
       offre: item["OFFRE"],
       lien: item["LIEN"],
       lien: item["LIEN_OFFRE"],
       cmde: item["CMDE"],
       cmde_link: item["LIEN_CMDE"],
-      x: item["x"],
       bl: item["BL"],
       bl_chrono: item["CHRONO_BL"],
       facture: item["FACTURE"],
@@ -72,9 +101,11 @@ exports.upload =  (req, res) => {
       regt_initial: item["REGT ATTENDU"],
       regt_expect: item["REGT ESPERE"],
       regt_final: item["REGT EFFECTIF"],
-      etp: item["ETP"],
+      etp: item["ETP calcul automatique"],
       charge: item["CHARGE"],
       rate: item["TAUX"],
+      production: item["PRODUCTION"],
+      jalon: item["JALON PAIEMENT"],
       ca: item["CA"],
       debours: item["DEBOURS"],
       start_date: item["DEBUT"],
@@ -90,7 +121,7 @@ exports.upload =  (req, res) => {
     data.end_date = moment(data.end_date, 'DD-MM-YYYY').format('YYYY-MM-DD[T00:00:00.000Z]');
     data.end_date_revised = moment(data.end_date_revised, 'DD-MM-YYYY').format('YYYY-MM-DD[T00:00:00.000Z]');
     for(var i in data) {
-      if(data[i] == undefined) {
+      if(data[i] == undefined || null) {
         data[i] = "";
       }
     }
@@ -100,20 +131,21 @@ exports.upload =  (req, res) => {
     var parts = wbsExtract;
     if(parts) {
       data.nestedLevel = parts.length -1;
-      if(data.wbs || data.wbs !== "") {
+      if(data.wbs || data.wbs !== "" && data.level === "PROJET") {
         if(data.nestedLevel == 0) {
-          data._id = new mongoose.mongo.ObjectId();
+          data._id = uuidv4();
           // parentWbs = data.wbs
           data.type = 'project'
           data.wp = false;
           data.schedules = []
           projects.push(data)
         } else if(data.nestedLevel !== 0 && data.level === "WP"){
-          data._id = new mongoose.mongo.ObjectId();
+          data._id = uuidv4();
           data.type = 'project';
           data.wp = true;
           parts.pop()
           var parent = parts[0];
+          // console.log(parent)
           pushToProject(parent, data, false)
         } else if(data.nestedLevel !== 0 && data.level === "TASK"){
           data.type = 'task';
@@ -151,7 +183,89 @@ exports.upload =  (req, res) => {
         }
       }
     }
+
+
+    // Client.findOne({name:project.client}).then(response => {
+    //   project.client = response.name;
+    // })
+    // .catch(err => {
+    //   console.log(err)
+    // })
+
+    // functionModel.findOne({name:project.function}).then(response => {
+    //   if(response) project.function = response._id;
+      
+    // })
+    // .catch(err => {
+    //   console.log(err)
+    // })
+
+    // Skill.findOne({name:project.skill}).then(response => {
+    //   if(response) project.skill = response._id ;
+    // })
+    // .catch(err => {
+    //   console.log(err)
+    // })
   }
+
+  // for(let clientName of clients) {
+  //   const client = new Client({
+  //     name: clientName,
+  //   });
+
+  //   client
+  //   .save(client)
+  //   .then(response => {
+  //     // console.log(response)
+  //     // clientId = mongoose.Types.ObjectId(response._id)
+  //   })
+  //   .catch(err => {
+  //     res.status(500).send({
+  //       message:
+  //         err.message || "Some error occurred while creating the client state."
+  //     });
+  //   })
+  // }
+
+  
+
+  // for(let functionName of functions) {
+  //   const fonction = new functionModel({
+  //     name: functionName,
+  //   });
+
+  //   fonction
+  //   .save(fonction)
+  //   .then(response => {
+  //     // console.log(response)
+  //     // functionId = mongoose.Types.ObjectId(response._id)
+  //   })
+  //   .catch(err => {
+  //     res.status(500).send({
+  //       message:
+  //         err.message || "Some error occurred while creating the client state."
+  //     });
+  //   })
+  // }
+
+  // for(let skillName of skills) {
+  //   const skill = new Skill({
+  //     name: skillName,
+  //   });
+
+  //   skill
+  //   .save(skill)
+  //   .then(response => {
+  //     // console.log(response)
+  //     // skillId = mongoose.Types.ObjectId(response._id)
+  //   })
+  //   .catch(err => {
+  //     res.status(500).send({
+  //       message:
+  //         err.message || "Some error occurred while creating the client state."
+  //     });
+  //   })
+  // }
 
 
   // Save Project in the database

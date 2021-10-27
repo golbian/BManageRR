@@ -48,10 +48,16 @@ module.exports = mongoose => {
         type: String,
         wp: Boolean,
         name: String,
+        // client: {
+        //   type: mongoose.Schema.Types.ObjectId,
+        //   ref: "client"
+        // },
         client: String,
         contact: String,
         country: String,
         stage: String,
+        mode: String,
+        status: String,
         kam: String,
         pm : String,
         temp: String,
@@ -73,10 +79,19 @@ module.exports = mongoose => {
         ca: mongoose.Schema.Types.Mixed,
         debours: String,
         comments: String,
-        status: String,
         start_date: mongoose.Schema.Types.Mixed,
         end_date: mongoose.Schema.Types.Mixed,
         end_date_revised: mongoose.Schema.Types.Mixed,
+        // skill: {
+        //   type: mongoose.Schema.Types.ObjectId,
+        //   ref: "skill"
+        // },
+        skill: String,
+        // function: {
+        //   type: mongoose.Schema.Types.ObjectId,
+        //   ref: "function"
+        // },
+        function: String,
         parent: String,
         root: String,
         progress: Number,
@@ -94,12 +109,29 @@ module.exports = mongoose => {
         _id: String,
         wbs: String,
         type: String,
-        level: Number,
+        level: String,
         wp: Boolean,
         name: String,
+        nestedLevel: Number,
+        // client: {
+        //   type: mongoose.Schema.Types.ObjectId,
+        //   ref: "client"
+        // },
         client: String,
         contact: String,
         country: String,
+        mode: String,
+        status: String,
+        // skill: {
+        //   type: mongoose.Schema.Types.ObjectId,
+        //   ref: "skill"
+        // },
+        skill: String,
+        // function: {
+        //   type: mongoose.Schema.Types.ObjectId,
+        //   ref: "function"
+        // },
+        function: String,
         stage: String,
         kam: String,
         pm : String,

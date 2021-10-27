@@ -26,7 +26,7 @@ exports.findAll = (req, res) => {
   User.find(condition)
   .populate({
     path: 'roles',
-    populate: { path: 'roles' },
+    // populate: { path: 'roles' },
   })
   .select("-password")
     .then(data => {

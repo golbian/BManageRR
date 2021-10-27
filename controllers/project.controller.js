@@ -27,6 +27,8 @@ exports.create = (req, res) => {
   const project = new Project({
     _id: req.body._id,
     name: req.body.text,
+    wbs: req.body.wbs,
+    wp: req.body.wp,
     type: req.body.type,
     client: req.body.client,
     contact: req.body.contact,
@@ -46,7 +48,33 @@ exports.create = (req, res) => {
     ca: req.body.ca,
     comments: req.body.comments,
     country: req.body.country,
+    level: req.body.level,
+    mode: req.body.mode,
+    creation: req.body.creation,
+    function: req.body.function,
+    skill: req.body.skill,
+    resource: req.body.resource,
+    offre: req.body.offre,
+    lien: req.body.lien,
+    lien_offre: req.body.lien_offre,
+    cmde: req.body.cmde,
+    cmde_link: req.body.cmde_link,
+    bl: req.body.bl,
+    bl_chrono: req.body.bl_chrono,
+    facture: req.body.facture,
+    facture_link: req.body.facture_link,
+    facture_id: req.body.facture_id,
+    facture_date: req.body.facture_date,
+    regt_initial: req.body.regt_initial,
+    regt_expect: req.body.regt_expect,
+    regt_final: req.body.regt_final,
+    rate: req.body.rate,
+    production: req.body.production,
+    jalon: req.body.jalon,
+    debours: req.body.debours,
+    tpelig: req.body.tpelig,
   });
+  console.log(project)
 
   // Save Project in the database
   project
@@ -83,7 +111,7 @@ exports.findAll = (req, res) => {
       return Project.aggregate(aggregation).exec(function(err, doc) {
         Project.populate(doc, {
           path: 'schedules.links',
-          populate: { path: 'links', model:"link" }
+          // populate: { path: 'links', model:"link" }
         }, function(err, data) {
           if(err) {
             res.status(500).send({
@@ -149,7 +177,7 @@ exports.update = (req, res) => {
         message: "Data to update can not be empty!"
       });
     }
-  
+
     const id = req.params.id;
   
     Project.updateOne({_id: id}, req.body, { useFindAndModify: false })

@@ -1,13 +1,16 @@
 const dbConfig = require("../config/db.config.js");
 const mongoose = require("mongoose");
 
-mongoose.set('debug', true);
+// mongoose.set('debug', true);
 
 mongoose.Promise = global.Promise;
 
 const db = {};
 db.mongoose = mongoose;
 db.url = process.env.DB;
+db.client = require("./client.model.js")(mongoose);
+db.function = require("./function.model.js")(mongoose);
+db.skill = require("./skill.model.js")(mongoose);
 db.grid = require("./grid.model.js")(mongoose);
 db.user = require("./user.model.js")(mongoose);
 db.role = require("./role.model.js")(mongoose);
