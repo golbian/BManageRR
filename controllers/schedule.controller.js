@@ -69,7 +69,7 @@ exports.findOne = (req, res) => {
         "schedules.$.start_date": req.body.start_date,
         "schedules.$.duration": req.body.duration,
         "schedules.$.parent": req.body.parent,
-        "schedules.$.client": req.body.client,
+        // "schedules.$.client": req.body.client,
         "schedules.$.domaine": req.body.domaine,
         "schedules.$.status": req.body.status,
         "schedules.$.type": req.body.type, 

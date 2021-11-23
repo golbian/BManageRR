@@ -52,7 +52,7 @@ module.exports = mongoose => {
         //   type: mongoose.Schema.Types.ObjectId,
         //   ref: "client"
         // },
-        client: String,
+        // client: String,
         contact: String,
         country: String,
         stage: String,
