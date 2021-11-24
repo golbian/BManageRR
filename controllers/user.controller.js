@@ -70,7 +70,32 @@ exports.update = (req, res) => {
     });
   }
 
-  console.log(req.body)
+  const id = req.params.id;
+
+  User.update({_id: id}, req.body, { useFindAndModify: false })
+    .then(data => {
+      console.log('data', data)
+      if (!data) {
+        res.status(404).send({
+          message: `Cannot update User with id=${id}. Maybe User was not found!`
+        });
+      } else res.send({ message: "User was updated successfully." });
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).send({
+        message: "Error updating User with id=" + id
+      });
+    });
+};
+
+// Update an User by an Admin
+exports.updateByAdmin = (req, res) => {
+  if (!req.body) {
+    return res.status(400).send({
+      message: "Data to update can not be empty!"
+    });
+  }
 
   const id = req.params.id;
 
