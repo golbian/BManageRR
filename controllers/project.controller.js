@@ -101,7 +101,18 @@ exports.findAll = (req, res) => {
     // } else {
       var aggregation = [
         { $match: { name: { $regex: getName(req.query.search) }, client: {$regex: getClient(req.query.client) } } },
-        { $addFields: { total: { $sum: "$schedules.charge" }, "schedules.root": "$$ROOT._id", "schedules.client": "$$ROOT.client" } },
+        { $addFields: { 
+          total: { 
+            $sum: "$schedules.charge" 
+          }, 
+          "schedules.root": "$$ROOT._id",
+          "schedules.client": "$$ROOT.client",
+          "schedules.country": "$$ROOT.country",
+          "schedules.domaine": "$$ROOT.domaine",
+          "schedules.kam": "$$ROOT.kam",
+          "schedules.pm": "$$ROOT.pm",
+          } 
+        },
         { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value)} }
       ]
     // }

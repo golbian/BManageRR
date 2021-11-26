@@ -66,11 +66,13 @@ exports.findOne = (req, res) => {
     Project.findOneAndUpdate(
        {_id: id, "schedules._id": scheduleId},
        {
+        "schedules.$.wbs": req.body.wbs,
+
         "schedules.$.start_date": req.body.start_date,
         "schedules.$.duration": req.body.duration,
         "schedules.$.parent": req.body.parent,
         // "schedules.$.client": req.body.client,
-        "schedules.$.domaine": req.body.domaine,
+        // "schedules.$.domaine": req.body.domaine,
         "schedules.$.status": req.body.status,
         "schedules.$.type": req.body.type, 
         "schedules.$.progress": req.body.progress,
@@ -78,7 +80,7 @@ exports.findOne = (req, res) => {
         "schedules.$.end_date_revised": req.body.end_date_revised,
         "schedules.$.name": req.body.name,
         "schedules.$.contract": req.body.contract,
-        "schedules.$.country": req.body.country,
+        // "schedules.$.country": req.body.country,
         "schedules.$.kam": req.body.kam,
         "schedules.$.charge": req.body.charge,
         "schedules.$.pm": req.body.pm,
