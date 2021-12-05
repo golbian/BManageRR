@@ -95,7 +95,7 @@ exports.findAll = (req, res) => {
 
     // if(getName(req.query.search) === "" && getClient(req.query.client) === "") {
     //   var aggregation = [
-    //     { $addFields: { total: { $sum: "$schedules.charge" } } },
+    //     { $addFields: { total: { $sum: "$tasks.charge" } } },
     //     { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value)} }
     //   ]
     // } else {
@@ -103,14 +103,14 @@ exports.findAll = (req, res) => {
         { $match: { name: { $regex: getName(req.query.search) }, client: {$regex: getClient(req.query.client) } } },
         { $addFields: { 
           total: { 
-            $sum: "$schedules.charge" 
+            $sum: "$tasks.charge" 
           }, 
-          "schedules.root": "$$ROOT._id",
-          "schedules.client": "$$ROOT.client",
-          "schedules.country": "$$ROOT.country",
-          "schedules.domaine": "$$ROOT.domaine",
-          "schedules.kam": "$$ROOT.kam",
-          "schedules.pm": "$$ROOT.pm",
+          "tasks.root": "$$ROOT._id",
+          "tasks.client": "$$ROOT.client",
+          "tasks.country": "$$ROOT.country",
+          "tasks.domaine": "$$ROOT.domaine",
+          "tasks.kam": "$$ROOT.kam",
+          "tasks.pm": "$$ROOT.pm",
           } 
         },
         { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value)} }
@@ -121,7 +121,7 @@ exports.findAll = (req, res) => {
     .then(()=>{
       return Project.aggregate(aggregation).exec(function(err, doc) {
         Project.populate(doc, {
-          path: 'schedules.links',
+          path: 'tasks.links',
           // populate: { path: 'links', model:"link" }
         }, function(err, data) {
           if(err) {
@@ -139,7 +139,7 @@ exports.findAll = (req, res) => {
 
   //     // exec(function(err, data) {
   //           /*Project.populate(doc , {
-  //             path: 'schedules.resources',
+  //             path: 'tasks.resources',
   //             populate: { path: 'resources' }
   //           },
   //           function(err, data) {*/
@@ -164,7 +164,7 @@ exports.findOne = (req, res) => {
   
     Project.findById(id)
       // .populate({
-      //   path: 'schedules.resources',
+      //   path: 'tasks.resources',
       //   populate: { path: 'resources' }
       // })
       .then(data => {
@@ -224,7 +224,7 @@ exports.update = (req, res) => {
       } else res.send({ message: "Project Manager was updated successfully." });
       var charges = [];
       
-      for(const charge of data.schedules) {
+      for(const charge of data.tasks) {
         charges.push(charge);
       }
     })
@@ -279,7 +279,7 @@ exports.deleteAll = (req, res) => {
 exports.findAllPublished = (req, res) => {
     Project.find({ published: true })
     // .populate({
-    //   path: 'schedules.resources',
+    //   path: 'tasks.resources',
     //   populate: { path: 'resources' },
     //   select: "username"
     // })
@@ -301,12 +301,12 @@ exports.findAllPublished = (req, res) => {
         { $and : [
           { $or: [
             {pm: pm},
-            {'schedules.pm': pm}
+            {'tasks.pm': pm}
           ]},
-        {$or: [{stage:'8. COMMANDE'}, {stage:'9. EN COURS'},{'schedules.$.stage':'8. COMMANDE'}, {'schedules.$.stage':'9. EN COURS'}] },
+        {$or: [{stage:'8. COMMANDE'}, {stage:'9. EN COURS'},{'tasks.$.stage':'8. COMMANDE'}, {'tasks.$.stage':'9. EN COURS'}] },
       ]}
       },
-      { $addFields: { total: { $sum: "$schedules.charge" } ,"schedules.root": "$$ROOT._id", "schedules.client": "$$ROOT.client"} },
+      { $addFields: { total: { $sum: "$tasks.charge" } ,"tasks.root": "$$ROOT._id", "tasks.client": "$$ROOT.client"} },
     ]
     Project.find()
     .then(()=>{
@@ -330,12 +330,12 @@ exports.findAllPublished = (req, res) => {
         { $and : [
           { $or: [
             {kam: kam},
-            {'schedules.kam': kam}
+            {'tasks.kam': kam}
           ] },
           {$or: [{stage:'8. COMMANDE'}, {stage:'9. EN COURS'}] },
       ]}
       },
-      { $addFields: { total: { $sum: "$schedules.charge" } } },
+      { $addFields: { total: { $sum: "$tasks.charge" } } },
     ]
     Project.find()
     .then(()=>{
@@ -355,8 +355,8 @@ exports.findAllPublished = (req, res) => {
   exports.findAllUsersForTimesheet = (req, res) => {
     const resource = req.params.resource;
     var aggregation = [
-      { $match: { $and : [{"schedules.resources._id":resource}, {$or: [{stage:'8. COMMANDE'}, {stage:'9. EN COURS'},{'schedules.$.stage':'8. COMMANDE'}, {'schedules.$.stage':'9. EN COURS'}] } ]}},
-      { $addFields: { total: { $sum: "$schedules.charge" }, "schedules.root": "$$ROOT._id", "schedules.client": "$$ROOT.client"} },
+      { $match: { $and : [{"tasks.resources._id":resource}, {$or: [{stage:'8. COMMANDE'}, {stage:'9. EN COURS'},{'tasks.$.stage':'8. COMMANDE'}, {'tasks.$.stage':'9. EN COURS'}] } ]}},
+      { $addFields: { total: { $sum: "$tasks.charge" }, "tasks.root": "$$ROOT._id", "tasks.client": "$$ROOT.client"} },
   ]
     Project.find()
     .then(()=>{
@@ -380,29 +380,29 @@ exports.findAllPublished = (req, res) => {
         { $match: 
           { $or: [
             {pm: pm}, 
-            {'schedules.pm': pm}
+            {'tasks.pm': pm}
           ]}
         }, 
-        { $addFields: { total: { $sum: "$schedules.charge" } } },
+        { $addFields: { total: { $sum: "$tasks.charge" } } },
         { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value)} }
       ]
     } else {
       var aggregation = [
         { $match: { pm:pm , name: { $regex: getName(req.query.search) }, client: {$regex: getClient(req.query.client)} } },
-        { $addFields: { total: { $sum: "$schedules.charge" }, "schedules.root": "$$ROOT._id", "schedules.client": "$$ROOT.client" } },
+        { $addFields: { total: { $sum: "$tasks.charge" }, "tasks.root": "$$ROOT._id", "tasks.client": "$$ROOT.client" } },
         { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value)} }
       ]
     }
 
     Project.find()
     .populate({
-      path: 'schedules.links',
+      path: 'tasks.links',
       // populate: { path: 'links', model:"link" }
     })
     .then(()=>{
       return Project.aggregate(aggregation).exec(function(err, data) {
       /*Project.populate(doc, {
-        path: 'schedules.resources',
+        path: 'tasks.resources',
         populate: { path: 'resources' },
         select: "username"
         }, function(err, data) {*/
@@ -424,26 +424,26 @@ exports.findAllPublished = (req, res) => {
     if(getName(req.query.search) === "" && getClient(req.query.client) === "") {
       var aggregation = [
         { $match: { kam: kam } },
-        { $addFields: { total: { $sum: "$schedules.charge" } } },
+        { $addFields: { total: { $sum: "$tasks.charge" } } },
         { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value)} }
       ]
     } else {
       var aggregation = [
         { $match: { kam:kam , name: { $regex: getName(req.query.search) }, client: {$regex: getClient(req.query.client)}} },
-        { $addFields: { total: { $sum: "$schedules.charge" }, "schedules.root": "$$ROOT._id", "schedules.client": "$$ROOT.client" } },
+        { $addFields: { total: { $sum: "$tasks.charge" }, "tasks.root": "$$ROOT._id", "tasks.client": "$$ROOT.client" } },
         { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value)} }
       ]
     }
 
     Project.find()
     .populate({
-      path: 'schedules.links',
+      path: 'tasks.links',
       // populate: { path: 'links', model:"link" }
     })
     .then(()=>{
       return Project.aggregate(aggregation).exec(function(err, data) {
       /*Project.populate(doc, {
-        path: 'schedules.resources',
+        path: 'tasks.resources',
         populate: { path: 'resources' },
         select: "username"
         }, function(err, data) {*/
@@ -464,25 +464,25 @@ exports.findAllPublished = (req, res) => {
     const resource = req.params.resource;
     if(getName(req.query.search) === "" && getClient(req.query.client) === "") {
       var aggregation = [
-        { $match: { "schedules.resources._id":resource } },
-        { $addFields: { total: { $sum: "$schedules.charge" } } },
+        { $match: { "tasks.resources._id":resource } },
+        { $addFields: { total: { $sum: "$tasks.charge" } } },
         { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value)} }
       ]
     } else {
       var aggregation = [
-        { $match: { "schedules.resources._id":resource , name: { $regex: getName(req.query.search) } } },
-        { $addFields: { total: { $sum: "$schedules.charge" }, "schedules.root": "$$ROOT._id", "schedules.client": "$$ROOT.client" } },
+        { $match: { "tasks.resources._id":resource , name: { $regex: getName(req.query.search) } } },
+        { $addFields: { total: { $sum: "$tasks.charge" }, "tasks.root": "$$ROOT._id", "tasks.client": "$$ROOT.client" } },
         { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value)} }
       ]
     }
     Project.find().populate({
-      path: 'schedules.links',
+      path: 'tasks.links',
       // populate: { path: 'links', model:"link" }
     })
     .then(()=>{
       return Project.aggregate(aggregation).exec(function(err, data) {
       /*Project.populate(doc, {
-        path: 'schedules.resources',
+        path: 'tasks.resources',
         populate: { path: 'resources' },
         select: "username"
         }, function(err, data) {*/

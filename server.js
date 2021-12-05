@@ -61,7 +61,7 @@ require("./routes/client.routes")(app);
 require("./routes/function.routes")(app);
 require("./routes/skill.routes")(app);
 require('./routes/project.routes')(app);
-require('./routes/schedule.routes')(app);
+require('./routes/task.routes')(app);
 require('./routes/event.routes')(app);
 require('./routes/link.routes')(app);
 require('./routes/import.routes')(app);

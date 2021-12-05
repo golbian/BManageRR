@@ -22,51 +22,51 @@ exports.upload =  (req, res) => {
   .fromFile(req.file.path, {defaultEncoding: 'UTF8'})
   .then((file)=>{
     var projects = [];
-  // var schedules = [];
+  // var tasks = [];
 
   var pushToProject = function(parentWbs, schedule, task) {
       if(!task) {
         console.log(parentWbs)
         const project = projects.find(p => p.wbs === parentWbs);
-        const wp = project.schedules.find(w => w.wbs === parentWbs);
+        const wp = project.tasks.find(w => w.wbs === parentWbs);
         schedule.parent = project._id
-        project.schedules.push(schedule);
+        project.tasks.push(schedule);
       } else {
         const project = projects.find(p => p.wbs === parentWbs.substr(0,7));
-        const wp = project.schedules.find(w => w.wbs === parentWbs);
+        const wp = project.tasks.find(w => w.wbs === parentWbs);
         if(wp == undefined) {
           schedule.parent = project._id
-          project.schedules.push(schedule);
+          project.tasks.push(schedule);
         } else {
           schedule.parent = wp._id;
-          project.schedules.push(schedule);
+          project.tasks.push(schedule);
         }
       }
   }
 
-  const clients = []
-  const functions = []
-  const skills = []
+  // const clients = []
+  // const functions = []
+  // const skills = []
 
   for( const item of file ) {
 
-    if(item["Client"] != '') {
-      if(clients.find(c => c == item["Client"]) === undefined) {
-        clients.push(item["Client"]);
-      }
-    }
+    // if(item["Client"] != '') {
+    //   if(clients.find(c => c == item["Client"]) === undefined) {
+    //     clients.push(item["Client"]);
+    //   }
+    // }
 
-    if(item["FONCTION"] != '') {
-      if(functions.find(f => f == item["FONCTION"]) === undefined) {
-        functions.push(item["FONCTION"]);
-      }
-    }
+    // if(item["FONCTION"] != '') {
+    //   if(functions.find(f => f == item["FONCTION"]) === undefined) {
+    //     functions.push(item["FONCTION"]);
+    //   }
+    // }
 
-    if(item["COMPETENCE"] != '') {
-      if(skills.find(s => s == item["COMPETENCE"]) === undefined) {
-        skills.push(item["COMPETENCE"]);
-      }
-    }
+    // if(item["COMPETENCE"] != '') {
+    //   if(skills.find(s => s == item["COMPETENCE"]) === undefined) {
+    //     skills.push(item["COMPETENCE"]);
+    //   }
+    // }
 
     var data = {
       wbs: item["REFERENCE"],
@@ -137,7 +137,7 @@ exports.upload =  (req, res) => {
           // parentWbs = data.wbs
           data.type = 'project'
           data.wp = false;
-          data.schedules = []
+          data.tasks = []
           projects.push(data)
         } else if(data.nestedLevel !== 0 && data.level === "WP"){
           data._id = uuidv4();
@@ -171,7 +171,7 @@ exports.upload =  (req, res) => {
     if(project.charge === null) {
       project.charge = 0;
     }
-    for(const schedule of project.schedules) {
+    for(const schedule of project.tasks) {
       if (schedule) {
         if(schedule.charge !== "TBD" || schedule.charge !== "") {
           schedule.charge = parseInt(schedule.charge)

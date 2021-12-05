@@ -164,7 +164,7 @@ module.exports = mongoose => {
         progress: Number,
         duration: mongoose.Schema.Types.Mixed,
         published: Boolean,
-        schedules: [taskSchema],
+        tasks: [taskSchema],
     },
     { timestamps: true }
     );

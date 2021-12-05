@@ -1,29 +1,20 @@
-// const tasks = require("../controllers/project.controller.js");
-// const { authJwt } = require("../middlewares");
-// module.exports = app => {
+const tasks = require("../controllers/task.controller.js");
+const { authJwt } = require("../middlewares");
+module.exports = app => {
+  
+    var router = require("express").Router();
 
-//     var router = require("express").Router();
-  
-//     // Create a new Project
-//     router.post("/",[authJwt.verifyToken, authJwt.isAdmin], tasks.create);
-  
-//     // Retrieve all Projects
-//     router.get("/", [authJwt.verifyToken, authJwt.isAdmin], tasks.findAll);
-  
-//     // Retrieve all published Projects
-//     router.get("/published",[authJwt.verifyToken], tasks.findAllPublished);
+    //Create a new Schedule
+    router.post("/:root",[authJwt.verifyToken, authJwt.isPm], tasks.create);
 
-//     //Retrieve all Owner's projects
-//     router.get("/user/:user",[authJwt.verifyToken, authJwt.isModerator], tasks.findAllOwnerProject);
+    //Find a Schedule
+    router.get("/:projectId/:taskId", [authJwt.verifyToken], tasks.findOne);
+
+    //Update task in a Project
+    router.put("/:root",[authJwt.verifyToken, authJwt.isPm], tasks.update);
+
+    //Delete a Schedule with id
+    router.delete("/:projectId/:taskId", [authJwt.verifyToken, authJwt.isPm], tasks.delete)
   
-//     // Retrieve a single Project with id
-//     router.get("/:id",[authJwt.verifyToken, authJwt.isModerator], tasks.findOne);
-  
-//     // Update a Project with id
-//     router.put("/:id",[authJwt.verifyToken, authJwt.isAdmin], tasks.update);
-  
-//     // Delete a Project with id
-//     router.delete("/:id",[authJwt.verifyToken, authJwt.isAdmin], tasks.delete);
-  
-//     app.use('/api/task', router);
-//   };
+    app.use('/api/task', router);
+  };
