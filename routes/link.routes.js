@@ -1,19 +1,17 @@
 const links = require("../controllers/link.controller.js");
 const { authJwt } = require("../middlewares");
-module.exports = app => {
+module.exports = (app) => {
+  var router = require("express").Router();
 
-  
-    var router = require("express").Router();
+  //Create a new link
+  router.post("/:id", [authJwt.verifyToken], links.create);
 
-    //Create a new link
-    router.post("/:id",[authJwt.verifyToken], links.create);
+  //Update link in a Project
 
-    //Update link in a Project
+  router.put("/:id", [authJwt.verifyToken], links.update);
 
-    router.put("/:id",[authJwt.verifyToken], links.update);
+  //Delete a link with id
+  router.delete("/:id", [authJwt.verifyToken], links.delete);
 
-    //Delete a link with id
-    router.delete("/:id",[authJwt.verifyToken], links.delete);
-  
-    app.use('/api/link', router);
-  };
+  app.use("/api/link", router);
+};

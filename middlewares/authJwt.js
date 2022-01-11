@@ -29,7 +29,7 @@ isAdmin = (req, res, next) => {
 
     Role.find(
       {
-        _id: { $in: user.roles }
+        _id: { $in: user.roles },
       },
       (err, roles) => {
         if (err) {
@@ -60,7 +60,7 @@ isAuthorized = (req, res, next) => {
 
     Role.find(
       {
-        _id: { $in: user.roles }
+        _id: { $in: user.roles },
       },
       (err, roles) => {
         if (err) {
@@ -69,7 +69,11 @@ isAuthorized = (req, res, next) => {
         }
 
         for (let i = 0; i < roles.length; i++) {
-          if (roles[i].name === "pm" || roles[i].name === "kam" || roles[i].name === "admin") {
+          if (
+            roles[i].name === "pm" ||
+            roles[i].name === "kam" ||
+            roles[i].name === "admin"
+          ) {
             next();
             return;
           }
@@ -91,7 +95,7 @@ isPm = (req, res, next) => {
 
     Role.find(
       {
-        _id: { $in: user.roles }
+        _id: { $in: user.roles },
       },
       (err, roles) => {
         if (err) {
@@ -122,7 +126,7 @@ isKam = (req, res, next) => {
 
     Role.find(
       {
-        _id: { $in: user.roles }
+        _id: { $in: user.roles },
       },
       (err, roles) => {
         if (err) {
@@ -144,7 +148,6 @@ isKam = (req, res, next) => {
   });
 };
 
-
 isModerator = (req, res, next) => {
   User.findById(req.userId).exec((err, user) => {
     if (err) {
@@ -154,7 +157,7 @@ isModerator = (req, res, next) => {
 
     Role.find(
       {
-        _id: { $in: user.roles }
+        _id: { $in: user.roles },
       },
       (err, roles) => {
         if (err) {
@@ -183,6 +186,6 @@ const authJwt = {
   isModerator,
   isKam,
   isPm,
-  isAuthorized
+  isAuthorized,
 };
 module.exports = authJwt;

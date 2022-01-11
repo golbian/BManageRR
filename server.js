@@ -156,8 +156,28 @@ server.listen(PORT, () => {
 
 io.on('connection', (socket) =>{
   console.log(`Connecté au client ${socket.id}`)
-  socket.on('ganttChange', data => {
-    console.log("update task with id= "+ data +" in gantt")
-    socket.broadcast.emit('ganttUpdate')
-  })
+  socket.on('createProject', data => {
+    socket.broadcast.emit('createProject', data);
+  });
+  socket.on('createTask', data => {
+    socket.broadcast.emit('createTask', data);
+  });
+  socket.on('updateProject', data => {
+    socket.broadcast.emit('updateProject', data);
+  });
+  socket.on('updateTask', data => {
+    socket.broadcast.emit('updateTask', data);
+  });
+  socket.on('deleteProject', data => {
+    socket.broadcast.emit('deleteProject', data);
+  });
+  socket.on('deleteTask', data => {
+    socket.broadcast.emit('deleteTask', data);
+  });
+  socket.on('createLink', data => {
+    socket.broadcast.emit('createLink', data);
+  });
+  socket.on('deleteLink', data => {
+    socket.broadcast.emit('deleteLink', data);
+  });
 })

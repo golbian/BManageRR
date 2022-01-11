@@ -1,13 +1,12 @@
 const fileImport = require("../controllers/import.controller.js");
 const { authJwt } = require("../middlewares");
-const multer =  require('multer');
-const upload = multer( { dest : './api/upload' } );
+const multer = require("multer");
+const upload = multer({ dest: "./api/upload" });
 
-module.exports = app => {
+module.exports = (app) => {
+  var router = require("express").Router();
 
-    var router = require("express").Router();
+  router.post("/upload", fileImport.upload);
 
-    router.post("/upload" , fileImport.upload );
-    
-    app.use('/api', upload.single('file'), router);
-  };
+  app.use("/api", upload.single("file"), router);
+};

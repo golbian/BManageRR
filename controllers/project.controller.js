@@ -2,24 +2,30 @@ const db = require("../models");
 const mongoose = require("mongoose");
 const Project = db.project;
 
-var getName = function( search ) {
-  return search == undefined ? ""
-       : search == "undefined" ? ""
-       : search == "" ? ""
-       : new RegExp(search, 'i')
-}
+var getName = function (search) {
+  return search == undefined
+    ? ""
+    : search == "undefined"
+    ? ""
+    : search == ""
+    ? ""
+    : new RegExp(search, "i");
+};
 
-var getClient = function( client ) {
-  return client == undefined ? ""
-       : client == "undefined" ? ""
-       : client == "" ? ""
-       : new RegExp(client, 'i')
-}
+var getClient = function (client) {
+  return client == undefined
+    ? ""
+    : client == "undefined"
+    ? ""
+    : client == ""
+    ? ""
+    : new RegExp(client, "i");
+};
 
 // Create and Save a new Project
 exports.create = (req, res) => {
-   // Validate request
-   if (!req.body) {
+  // Validate request
+  if (!req.body) {
     res.status(400).send({ message: "Content can not be empty!" });
     return;
   }
@@ -74,68 +80,76 @@ exports.create = (req, res) => {
     debours: req.body.debours,
     tpelig: req.body.tpelig,
   });
-  console.log(project)
+  console.log(project);
 
   // Save Project in the database
   project
     .save(project)
-    .then(data => {
+    .then((data) => {
       res.send(data);
     })
-    .catch(err => {
+    .catch((err) => {
       res.status(500).send({
         message:
-          err.message || "Some error occurred while creating the Project state."
+          err.message ||
+          "Some error occurred while creating the Project state.",
       });
     });
 };
 
 // Retrieve all Projects from the database.
 exports.findAll = (req, res) => {
-
-    // if(getName(req.query.search) === "" && getClient(req.query.client) === "") {
-    //   var aggregation = [
-    //     { $addFields: { total: { $sum: "$tasks.charge" } } },
-    //     { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value)} }
-    //   ]
-    // } else {
-      var aggregation = [
-        { $match: { name: { $regex: getName(req.query.search) }, client: {$regex: getClient(req.query.client) } } },
-        { $addFields: { 
-          total: { 
-            $sum: "$tasks.charge" 
-          }, 
-          "tasks.root": "$$ROOT._id",
-          "tasks.client": "$$ROOT.client",
-          "tasks.country": "$$ROOT.country",
-          "tasks.domaine": "$$ROOT.domaine",
-          "tasks.kam": "$$ROOT.kam",
-          "tasks.pm": "$$ROOT.pm",
-          } 
+  // if(getName(req.query.search) === "" && getClient(req.query.client) === "") {
+  //   var aggregation = [
+  //     { $addFields: { total: { $sum: "$tasks.charge" } } },
+  //     { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value)} }
+  //   ]
+  // } else {
+  var aggregation = [
+    {
+      $match: {
+        name: { $regex: getName(req.query.search) },
+        client: { $regex: getClient(req.query.client) },
+      },
+    },
+    {
+      $addFields: {
+        total: {
+          $sum: "$tasks.charge",
         },
-        { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value)} }
-      ]
-    // }
+        "tasks.root": "$$ROOT._id",
+        "tasks.client": "$$ROOT.client",
+        "tasks.country": "$$ROOT.country",
+        "tasks.domaine": "$$ROOT.domaine",
+        "tasks.kam": "$$ROOT.kam",
+        "tasks.pm": "$$ROOT.pm",
+      },
+    },
+    { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value) } },
+  ];
+  // }
 
-    Project.find()
-    .then(()=>{
-      return Project.aggregate(aggregation).exec(function(err, doc) {
-        Project.populate(doc, {
-          path: 'tasks.links',
+  Project.find().then(() => {
+    return Project.aggregate(aggregation).exec(function (err, doc) {
+      Project.populate(
+        doc,
+        {
+          path: "tasks.links",
           // populate: { path: 'links', model:"link" }
-        }, function(err, data) {
-          if(err) {
+        },
+        function (err, data) {
+          if (err) {
             res.status(500).send({
               message:
-                err.message || "Some error occurred while retrieving projects."
+                err.message || "Some error occurred while retrieving projects.",
             });
           } else {
             res.send(data);
           }
-        })
-      })
-    })
-
+        }
+      );
+    });
+  });
 
   //     // exec(function(err, data) {
   //           /*Project.populate(doc , {
@@ -156,345 +170,406 @@ exports.findAll = (req, res) => {
   // // });
 };
 
-
-
 // Find a single Project with an id
 exports.findOne = (req, res) => {
-    const id = req.params.id;
-  
-    Project.findById(id)
-      // .populate({
-      //   path: 'tasks.resources',
-      //   populate: { path: 'resources' }
-      // })
-      .then(data => {
-        if (!data)
-          res.status(404).send({ message: "Not found Project with id " + id });
-        else {
-          res.send(data);
-        }
-      })
-      .catch(err => {
-        res
-          .status(500)
-          .send({ message: "Error retrieving Project with id=" + id });
-      });
-  };
+  const id = req.params.id;
+
+  Project.findById(id)
+    // .populate({
+    //   path: 'tasks.resources',
+    //   populate: { path: 'resources' }
+    // })
+    .then((data) => {
+      if (!data)
+        res.status(404).send({ message: "Not found Project with id " + id });
+      else {
+        res.send(data);
+      }
+    })
+    .catch((err) => {
+      res
+        .status(500)
+        .send({ message: "Error retrieving Project with id=" + id });
+    });
+};
 
 // Update a Project by the id in the request
 exports.update = (req, res) => {
-    if (!req.body) {
-      return res.status(400).send({
-        message: "Data to update can not be empty!"
-      });
-    }
-
-    const id = req.params.id;
-  
-    Project.updateOne({_id: id}, req.body, { useFindAndModify: false })
-      .then(data => {
-        if (!data) {
-          res.status(404).send({
-            message: `Cannot update Project with id=${id}. Maybe Project was not found!`
-          });
-        } else res.send({ message: "Project was updated successfully." });
-      })
-      .catch(err => {
-        console.log(err);
-        res.status(500).send({
-          message: "Error updating Project with id=" + id
-        });
-      });
-  };
-
-  exports.attachPM = (req, res) => {
-    const id = req.params.id;
-    if (!req.body) {
-      return res.status(400).send({
-        message: "Data to update can not be empty!"
-      });
-    }
-
-    Project.findByIdAndUpdate(id, {$set: { "pm": req.body.pm ,"published": req.body.published}}, { useFindAndModify: false })
-    .then(data => {
-      if (!data) {
-        res.status(404).send({
-          message: `Cannot update Project Manager in Project with id=${id}. Maybe Project was not found!`
-        });
-      } else res.send({ message: "Project Manager was updated successfully." });
-      var charges = [];
-      
-      for(const charge of data.tasks) {
-        charges.push(charge);
-      }
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).send({
-        message: "Error updating Project with id=" + id
-      });
+  if (!req.body) {
+    return res.status(400).send({
+      message: "Data to update can not be empty!",
     });
   }
 
+  const id = req.params.id;
+
+  Project.updateOne({ _id: id }, req.body, { useFindAndModify: false })
+    .then((data) => {
+      if (!data) {
+        res.status(404).send({
+          message: `Cannot update Project with id=${id}. Maybe Project was not found!`,
+        });
+      } else res.send({ message: "Project was updated successfully." });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send({
+        message: "Error updating Project with id=" + id,
+      });
+    });
+};
+
+exports.attachPM = (req, res) => {
+  const id = req.params.id;
+  if (!req.body) {
+    return res.status(400).send({
+      message: "Data to update can not be empty!",
+    });
+  }
+
+  Project.findByIdAndUpdate(
+    id,
+    { $set: { pm: req.body.pm, published: req.body.published } },
+    { useFindAndModify: false }
+  )
+    .then((data) => {
+      if (!data) {
+        res.status(404).send({
+          message: `Cannot update Project Manager in Project with id=${id}. Maybe Project was not found!`,
+        });
+      } else res.send({ message: "Project Manager was updated successfully." });
+      var charges = [];
+
+      for (const charge of data.tasks) {
+        charges.push(charge);
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send({
+        message: "Error updating Project with id=" + id,
+      });
+    });
+};
+
 // Delete a Project with the specified id in the request
 exports.delete = (req, res) => {
-    const id = req.params.id;
+  const id = req.params.id;
 
-    Project.findOneAndDelete({_id : id}, { useFindAndModify: false })
-      .then(data => {
-        if (!data) {
-          res.status(404).send({
-            message: `Cannot delete Project with id=${id}. Maybe Project was not found!`
-          });
-        } else {
-          res.send({
-            message: "Project with id="+ id +" was deleted successfully!"
-          });
-        }
-      })
-      .catch(err => {
-        res.status(500).send({
-          message: "Could not delete Project with id=" + id
+  Project.findOneAndDelete({ _id: id }, { useFindAndModify: false })
+    .then((data) => {
+      if (!data) {
+        res.status(404).send({
+          message: `Cannot delete Project with id=${id}. Maybe Project was not found!`,
         });
+      } else {
+        res.send({
+          message: "Project with id=" + id + " was deleted successfully!",
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: "Could not delete Project with id=" + id,
       });
-  };
+    });
+};
 
 // Delete all Projects from the database.
 exports.deleteAll = (req, res) => {
-    Project.deleteMany({})
-      .then(data => {
-        res.send({
-          message: `${data.deletedCount} Projects were deleted successfully!`
-        });
-      })
-      .catch(err => {
-        res.status(500).send({
-          message:
-            err.message || "Some error occurred while removing all projects."
-        });
+  Project.deleteMany({})
+    .then((data) => {
+      res.send({
+        message: `${data.deletedCount} Projects were deleted successfully!`,
       });
-  };
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while removing all projects.",
+      });
+    });
+};
 
 // Find all published Projects
 exports.findAllPublished = (req, res) => {
-    Project.find({ published: true })
+  Project.find({ published: true })
     // .populate({
     //   path: 'tasks.resources',
     //   populate: { path: 'resources' },
     //   select: "username"
     // })
-      .then(data => {
-        res.send(data);
-      })
-      .catch(err => {
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while retrieving projects.",
+      });
+    });
+};
+
+exports.findAllPmForTimesheet = (req, res) => {
+  const pm = req.params.pm;
+  var aggregation = [
+    {
+      $match: {
+        $and: [
+          { $or: [{ pm: pm }, { "tasks.pm": pm }] },
+          {
+            $or: [
+              { stage: "8. COMMANDE" },
+              { stage: "9. EN COURS" },
+              { "tasks.$.stage": "8. COMMANDE" },
+              { "tasks.$.stage": "9. EN COURS" },
+            ],
+          },
+        ],
+      },
+    },
+    {
+      $addFields: {
+        total: { $sum: "$tasks.charge" },
+        "tasks.root": "$$ROOT._id",
+        "tasks.client": "$$ROOT.client",
+      },
+    },
+  ];
+  Project.find().then(() => {
+    return Project.aggregate(aggregation).exec(function (err, data) {
+      if (err) {
         res.status(500).send({
           message:
-            err.message || "Some error occurred while retrieving projects."
+            err.message || "Some error occurred while retrieving projects.",
         });
-      });
-  };
+      } else {
+        res.send(data);
+      }
+    });
+  });
+};
 
-  exports.findAllPmForTimesheet = (req, res) => {
-    const pm = req.params.pm;
-    var aggregation = [
-      { $match:
-        { $and : [
-          { $or: [
-            {pm: pm},
-            {'tasks.pm': pm}
-          ]},
-        {$or: [{stage:'8. COMMANDE'}, {stage:'9. EN COURS'},{'tasks.$.stage':'8. COMMANDE'}, {'tasks.$.stage':'9. EN COURS'}] },
-      ]}
+exports.findAllKamForTimesheet = (req, res) => {
+  const kam = req.params.kam;
+  var aggregation = [
+    {
+      $match: {
+        $and: [
+          { $or: [{ kam: kam }, { "tasks.kam": kam }] },
+          { $or: [{ stage: "8. COMMANDE" }, { stage: "9. EN COURS" }] },
+        ],
       },
-      { $addFields: { total: { $sum: "$tasks.charge" } ,"tasks.root": "$$ROOT._id", "tasks.client": "$$ROOT.client"} },
-    ]
-    Project.find()
-    .then(()=>{
-      return Project.aggregate(aggregation).exec(function(err, data) {
-      if(err) {
-          res.status(500).send({
-            message:
-            err.message || "Some error occurred while retrieving projects."
-          });
-        } else {
-          res.send(data);
-        }
-      })
-    })
-  };
+    },
+    { $addFields: { total: { $sum: "$tasks.charge" } } },
+  ];
+  Project.find().then(() => {
+    return Project.aggregate(aggregation).exec(function (err, data) {
+      if (err) {
+        res.status(500).send({
+          message:
+            err.message || "Some error occurred while retrieving projects.",
+        });
+      } else {
+        res.send(data);
+      }
+    });
+  });
+};
 
-  exports.findAllKamForTimesheet = (req, res) => {
-    const kam = req.params.kam;
-    var aggregation = [
-      { $match:
-        { $and : [
-          { $or: [
-            {kam: kam},
-            {'tasks.kam': kam}
-          ] },
-          {$or: [{stage:'8. COMMANDE'}, {stage:'9. EN COURS'}] },
-      ]}
+exports.findAllUsersForTimesheet = (req, res) => {
+  const resource = req.params.resource;
+  var aggregation = [
+    {
+      $match: {
+        $and: [
+          { "tasks.resources._id": resource },
+          {
+            $or: [
+              { stage: "8. COMMANDE" },
+              { stage: "9. EN COURS" },
+              { "tasks.$.stage": "8. COMMANDE" },
+              { "tasks.$.stage": "9. EN COURS" },
+            ],
+          },
+        ],
       },
+    },
+    {
+      $addFields: {
+        total: { $sum: "$tasks.charge" },
+        "tasks.root": "$$ROOT._id",
+        "tasks.client": "$$ROOT.client",
+      },
+    },
+  ];
+  Project.find().then(() => {
+    return Project.aggregate(aggregation).exec(function (err, data) {
+      if (err) {
+        res.status(500).send({
+          message:
+            err.message || "Some error occurred while retrieving projects.",
+        });
+      } else {
+        res.send(data);
+      }
+    });
+  });
+};
+
+exports.findAllPmProject = (req, res) => {
+  const pm = req.params.pm;
+  if (getName(req.query.search) === "" && getClient(req.query.client) === "") {
+    var aggregation = [
+      { $match: { $or: [{ pm: pm }, { "tasks.pm": pm }] } },
       { $addFields: { total: { $sum: "$tasks.charge" } } },
-    ]
-    Project.find()
-    .then(()=>{
-      return Project.aggregate(aggregation).exec(function(err, data) {
-      if(err) {
-          res.status(500).send({
-            message:
-            err.message || "Some error occurred while retrieving projects."
-          });
-        } else {
-          res.send(data);
-        }
-      })
-    })
-  };
-
-  exports.findAllUsersForTimesheet = (req, res) => {
-    const resource = req.params.resource;
+      { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value) } },
+    ];
+  } else {
     var aggregation = [
-      { $match: { $and : [{"tasks.resources._id":resource}, {$or: [{stage:'8. COMMANDE'}, {stage:'9. EN COURS'},{'tasks.$.stage':'8. COMMANDE'}, {'tasks.$.stage':'9. EN COURS'}] } ]}},
-      { $addFields: { total: { $sum: "$tasks.charge" }, "tasks.root": "$$ROOT._id", "tasks.client": "$$ROOT.client"} },
-  ]
-    Project.find()
-    .then(()=>{
-      return Project.aggregate(aggregation).exec(function(err, data) {
-      if(err) {
+      {
+        $match: {
+          pm: pm,
+          name: { $regex: getName(req.query.search) },
+          client: { $regex: getClient(req.query.client) },
+        },
+      },
+      {
+        $addFields: {
+          total: { $sum: "$tasks.charge" },
+          "tasks.root": "$$ROOT._id",
+          "tasks.client": "$$ROOT.client",
+        },
+      },
+      { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value) } },
+    ];
+  }
+
+  Project.find()
+    .populate({
+      path: "tasks.links",
+      // populate: { path: 'links', model:"link" }
+    })
+    .then(() => {
+      return Project.aggregate(aggregation).exec(function (err, data) {
+        /*Project.populate(doc, {
+        path: 'tasks.resources',
+        populate: { path: 'resources' },
+        select: "username"
+        }, function(err, data) {*/
+        if (err) {
           res.status(500).send({
             message:
-            err.message || "Some error occurred while retrieving projects."
+              err.message || "Some error occurred while retrieving projects.",
           });
         } else {
           res.send(data);
         }
-      })
-    })
-  };
+      });
+    });
+  // })
+};
 
-  exports.findAllPmProject = (req, res) => {
-    const pm = req.params.pm;
-    if(getName(req.query.search) === "" && getClient(req.query.client) === "") {
-      var aggregation = [
-        { $match: 
-          { $or: [
-            {pm: pm}, 
-            {'tasks.pm': pm}
-          ]}
-        }, 
-        { $addFields: { total: { $sum: "$tasks.charge" } } },
-        { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value)} }
-      ]
-    } else {
-      var aggregation = [
-        { $match: { pm:pm , name: { $regex: getName(req.query.search) }, client: {$regex: getClient(req.query.client)} } },
-        { $addFields: { total: { $sum: "$tasks.charge" }, "tasks.root": "$$ROOT._id", "tasks.client": "$$ROOT.client" } },
-        { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value)} }
-      ]
-    }
+exports.findAllKamProject = (req, res) => {
+  const kam = req.params.kam;
+  if (getName(req.query.search) === "" && getClient(req.query.client) === "") {
+    var aggregation = [
+      { $match: { kam: kam } },
+      { $addFields: { total: { $sum: "$tasks.charge" } } },
+      { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value) } },
+    ];
+  } else {
+    var aggregation = [
+      {
+        $match: {
+          kam: kam,
+          name: { $regex: getName(req.query.search) },
+          client: { $regex: getClient(req.query.client) },
+        },
+      },
+      {
+        $addFields: {
+          total: { $sum: "$tasks.charge" },
+          "tasks.root": "$$ROOT._id",
+          "tasks.client": "$$ROOT.client",
+        },
+      },
+      { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value) } },
+    ];
+  }
 
-    Project.find()
+  Project.find()
     .populate({
-      path: 'tasks.links',
+      path: "tasks.links",
       // populate: { path: 'links', model:"link" }
     })
-    .then(()=>{
-      return Project.aggregate(aggregation).exec(function(err, data) {
-      /*Project.populate(doc, {
+    .then(() => {
+      return Project.aggregate(aggregation).exec(function (err, data) {
+        /*Project.populate(doc, {
         path: 'tasks.resources',
         populate: { path: 'resources' },
         select: "username"
         }, function(err, data) {*/
-        if(err) {
-            res.status(500).send({
-              message:
-                err.message || "Some error occurred while retrieving projects."
-            });
-          } else {
-            res.send(data);
-          }
-        })
-      })
-    // })
-  };
+        if (err) {
+          res.status(500).send({
+            message:
+              err.message || "Some error occurred while retrieving projects.",
+          });
+        } else {
+          res.send(data);
+        }
+      });
+    });
+  // })
+};
 
-  exports.findAllKamProject = (req, res) => {
-    const kam = req.params.kam;
-    if(getName(req.query.search) === "" && getClient(req.query.client) === "") {
-      var aggregation = [
-        { $match: { kam: kam } },
-        { $addFields: { total: { $sum: "$tasks.charge" } } },
-        { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value)} }
-      ]
-    } else {
-      var aggregation = [
-        { $match: { kam:kam , name: { $regex: getName(req.query.search) }, client: {$regex: getClient(req.query.client)}} },
-        { $addFields: { total: { $sum: "$tasks.charge" }, "tasks.root": "$$ROOT._id", "tasks.client": "$$ROOT.client" } },
-        { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value)} }
-      ]
-    }
-
-    Project.find()
+exports.findAllResourceProject = (req, res) => {
+  const resource = req.params.resource;
+  if (getName(req.query.search) === "" && getClient(req.query.client) === "") {
+    var aggregation = [
+      { $match: { "tasks.resources._id": resource } },
+      { $addFields: { total: { $sum: "$tasks.charge" } } },
+      { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value) } },
+    ];
+  } else {
+    var aggregation = [
+      {
+        $match: {
+          "tasks.resources._id": resource,
+          name: { $regex: getName(req.query.search) },
+        },
+      },
+      {
+        $addFields: {
+          total: { $sum: "$tasks.charge" },
+          "tasks.root": "$$ROOT._id",
+          "tasks.client": "$$ROOT.client",
+        },
+      },
+      { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value) } },
+    ];
+  }
+  Project.find()
     .populate({
-      path: 'tasks.links',
+      path: "tasks.links",
       // populate: { path: 'links', model:"link" }
     })
-    .then(()=>{
-      return Project.aggregate(aggregation).exec(function(err, data) {
-      /*Project.populate(doc, {
+    .then(() => {
+      return Project.aggregate(aggregation).exec(function (err, data) {
+        /*Project.populate(doc, {
         path: 'tasks.resources',
         populate: { path: 'resources' },
         select: "username"
         }, function(err, data) {*/
-        if(err) {
-            res.status(500).send({
-              message:
-                err.message || "Some error occurred while retrieving projects."
-            });
-          } else {
-            res.send(data);
-          }
-        })
-      })
-    // })
-  };
-
-  exports.findAllResourceProject = (req, res) => {
-    const resource = req.params.resource;
-    if(getName(req.query.search) === "" && getClient(req.query.client) === "") {
-      var aggregation = [
-        { $match: { "tasks.resources._id":resource } },
-        { $addFields: { total: { $sum: "$tasks.charge" } } },
-        { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value)} }
-      ]
-    } else {
-      var aggregation = [
-        { $match: { "tasks.resources._id":resource , name: { $regex: getName(req.query.search) } } },
-        { $addFields: { total: { $sum: "$tasks.charge" }, "tasks.root": "$$ROOT._id", "tasks.client": "$$ROOT.client" } },
-        { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value)} }
-      ]
-    }
-    Project.find().populate({
-      path: 'tasks.links',
-      // populate: { path: 'links', model:"link" }
-    })
-    .then(()=>{
-      return Project.aggregate(aggregation).exec(function(err, data) {
-      /*Project.populate(doc, {
-        path: 'tasks.resources',
-        populate: { path: 'resources' },
-        select: "username"
-        }, function(err, data) {*/
-        if(err) {
-            res.status(500).send({
-              message:
-                err.message || "Some error occurred while retrieving projects."
-            });
-          } else {
-            res.send(data);
-          }
-        })
-      })
-    // })
-  };
+        if (err) {
+          res.status(500).send({
+            message:
+              err.message || "Some error occurred while retrieving projects.",
+          });
+        } else {
+          res.send(data);
+        }
+      });
+    });
+  // })
+};

@@ -1,7 +1,7 @@
 const { authJwt } = require("../middlewares");
 const users = require("../controllers/user.controller");
 
-module.exports = app => {
+module.exports = (app) => {
   var router = require("express").Router();
 
   router.get("/public", users.allAccess);
@@ -25,16 +25,24 @@ module.exports = app => {
   router.get("/:id", [authJwt.verifyToken], users.findOne);
 
   // Update an User with id
-  router.put("/:id",[authJwt.verifyToken, authJwt.isAdmin], users.update);
+  router.put("/:id", [authJwt.verifyToken, authJwt.isAdmin], users.update);
 
   // Update an User with by Admin
-  router.put("/admin/:id",[authJwt.verifyToken, authJwt.isAdmin], users.update);
+  router.put(
+    "/admin/:id",
+    [authJwt.verifyToken, authJwt.isAdmin],
+    users.update
+  );
 
   // Delete a project with projectId in User with id
-  router.delete("/project/:id", [authJwt.verifyToken, authJwt.isAdmin], users.deleteProject);
-  
-  // Delete an User with id
-  router.delete("/:id",[authJwt.verifyToken, authJwt.isAdmin], users.delete);
+  router.delete(
+    "/project/:id",
+    [authJwt.verifyToken, authJwt.isAdmin],
+    users.deleteProject
+  );
 
-  app.use('/api/users', router);
+  // Delete an User with id
+  router.delete("/:id", [authJwt.verifyToken, authJwt.isAdmin], users.delete);
+
+  app.use("/api/users", router);
 };

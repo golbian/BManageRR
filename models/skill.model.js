@@ -1,11 +1,12 @@
-module.exports = mongoose => {
-    var skillSchema = mongoose.Schema({
+module.exports = (mongoose) => {
+  var skillSchema = mongoose.Schema(
+    {
       name: String,
       description: String,
-    }, 
+    },
     { timestamps: true }
-    )
-  
-    const Skill = mongoose.model("skill", skillSchema);
-    return Skill;
-  };
+  );
+
+  const Skill = mongoose.model("skill", skillSchema);
+  return Skill;
+};

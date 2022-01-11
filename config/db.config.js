@@ -1,3 +1,3 @@
 module.exports = {
-    url: process.env.DB
-  };
+  url: process.env.DB,
+};

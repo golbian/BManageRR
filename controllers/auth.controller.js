@@ -13,7 +13,7 @@ exports.signup = (req, res) => {
     email: req.body.email,
     sigle: req.body.sigle,
     password: bcrypt.hashSync(req.body.password, 8),
-    value: req.body.value
+    value: req.body.value,
   });
 
   user.save((err, user) => {
@@ -25,7 +25,7 @@ exports.signup = (req, res) => {
     if (req.body.roles) {
       Role.find(
         {
-          name: { $in: req.body.roles }
+          name: { $in: req.body.roles },
         },
         (err, roles) => {
           if (err) {
@@ -33,8 +33,8 @@ exports.signup = (req, res) => {
             return;
           }
 
-          user.roles = roles.map(role => role._id);
-          user.save(err => {
+          user.roles = roles.map((role) => role._id);
+          user.save((err) => {
             if (err) {
               res.status(500).send({ message: err });
               return;
@@ -52,7 +52,7 @@ exports.signup = (req, res) => {
         }
 
         user.roles = [role._id];
-        user.save(err => {
+        user.save((err) => {
           if (err) {
             res.status(500).send({ message: err });
             return;
@@ -66,9 +66,11 @@ exports.signup = (req, res) => {
 };
 
 exports.signin = (req, res) => {
-  User.findOne({
-    username: req.body.username
-  }, (err, user) => {
+  User.findOne(
+    {
+      username: req.body.username,
+    },
+    (err, user) => {
       if (err) {
         res.status(500).send({ message: err });
         return;
@@ -86,36 +88,40 @@ exports.signin = (req, res) => {
       if (!passwordIsValid) {
         return res.status(401).send({
           accessToken: null,
-          message: "Invalid Password!"
+          message: "Invalid Password!",
         });
       }
 
       var token = jwt.sign({ id: user.id }, secret, {
-        expiresIn: 86400 // 24 hours
+        expiresIn: 86400, // 24 hours
       });
 
       // var authorities = [];
 
-      Role.find()
-        .then(()=> {
-            return User.populate(user , {
-              path: 'roles',
-              // populate: { path: 'roles' },
-              select: "-_id"
-            }, function(err, data) {
-              if(!err) {
-                res.status(200).send({
-                  id: user._id,
-                  username: user.username,
-                  email: user.email,
-                  accessToken: token,
-                  roles: user.roles,
-                  sigle: user.sigle
-                });
-              } else {
-                console.log(err)
-              }
-          })
-        })
-    });
+      Role.find().then(() => {
+        return User.populate(
+          user,
+          {
+            path: "roles",
+            // populate: { path: 'roles' },
+            select: "-_id",
+          },
+          function (err, data) {
+            if (!err) {
+              res.status(200).send({
+                id: user._id,
+                username: user.username,
+                email: user.email,
+                accessToken: token,
+                roles: user.roles,
+                sigle: user.sigle,
+              });
+            } else {
+              console.log(err);
+            }
+          }
+        );
+      });
+    }
+  );
 };
