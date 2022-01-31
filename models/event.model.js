@@ -1,6 +1,7 @@
 module.exports = (mongoose) => {
   var eventSchema = mongoose.Schema(
     {
+      _id: String,
       name: String,
       activity: String,
       projectWbs: String,
