@@ -310,6 +310,45 @@ exports.findAllPublished = (req, res) => {
     });
 };
 
+exports.findAllAdminForTimesheet = (req, res) => {
+  var aggregation = [
+    {
+      '$match': {
+        '$or': [
+          {
+            'stage': '8. COMMANDE'
+          }, {
+            'stage': '9. EN COURS'
+          }, {
+            'tasks.$.stage': '8. COMMANDE'
+          }, {
+            'tasks.$.stage': '9. EN COURS'
+          }
+        ]
+      }
+    },
+    {
+      $addFields: {
+        total: { $sum: "$tasks.charge" },
+        "tasks.root": "$$ROOT._id",
+        "tasks.client": "$$ROOT.client",
+      },
+    },
+  ];
+  Project.find().then(() => {
+    return Project.aggregate(aggregation).exec(function (err, data) {
+      if (err) {
+        res.status(500).send({
+          message:
+            err.message || "Some error occurred while retrieving projects.",
+        });
+      } else {
+        res.send(data);
+      }
+    });
+  });
+};
+
 exports.findAllPmForTimesheet = (req, res) => {
   const pm = req.params.pm;
   var aggregation = [

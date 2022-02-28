@@ -2,7 +2,7 @@ const db = require("../models");
 const mongoose = require("mongoose");
 const Client = db.client;
 
-exports.create = (req, res) => {
+(exports.create = (req, res) => {
   if (!req.body) {
     res.status(400).send({ message: "Content can not be empty!" });
     return;
@@ -13,7 +13,7 @@ exports.create = (req, res) => {
     contact: req.body.contact,
   });
 
-  Client.save(client)
+  client.save(client)
     .then((data) => {
       res.send(data);
     })
@@ -23,25 +23,25 @@ exports.create = (req, res) => {
           err.message || "Some error occurred while creating the Event state.",
       });
     });
-};
+}),
+  // Retrieve all Clients from the database.
+  (exports.findAll = (req, res) => {
+    const name = req.query.name;
+    var condition = name
+      ? { name: { $regex: new RegExp(name), $options: "i" } }
+      : {};
 
-// Retrieve all Clients from the database.
-exports.findAll = (req, res) => {
-  const name = req.query.name;
-  var condition = name
-    ? { name: { $regex: new RegExp(name), $options: "i" } }
-    : {};
-
-  Client.find(condition)
-    .then((data) => {
-      res.send(data);
-    })
-    .catch((err) => {
-      res.status(500).send({
-        message: err.message || "Some error occurred while retrieving clients.",
+    Client.find(condition)
+      .then((data) => {
+        res.send(data);
+      })
+      .catch((err) => {
+        res.status(500).send({
+          message:
+            err.message || "Some error occurred while retrieving clients.",
+        });
       });
-    });
-};
+  });
 
 // Find a single Client with an id
 exports.findOne = (req, res) => {
@@ -104,35 +104,6 @@ exports.delete = (req, res) => {
     .catch((err) => {
       res.status(500).send({
         message: "Could not delete Client with id=" + id,
-      });
-    });
-};
-
-// Delete all Clients from the database.
-exports.deleteAll = (req, res) => {
-  Client.deleteMany({})
-    .then((data) => {
-      res.send({
-        message: `${data.deletedCount} Clients were deleted successfully!`,
-      });
-    })
-    .catch((err) => {
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while removing all clients.",
-      });
-    });
-};
-
-// Find all published Clients
-exports.findAllPublished = (req, res) => {
-  Client.find({ published: true })
-    .then((data) => {
-      res.send(data);
-    })
-    .catch((err) => {
-      res.status(500).send({
-        message: err.message || "Some error occurred while retrieving clients.",
       });
     });
 };

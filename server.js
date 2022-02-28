@@ -58,6 +58,7 @@ require("./routes/auth.routes")(app);
 require('./routes/user.routes')(app);
 require('./routes/roles.routes')(app);
 require("./routes/client.routes")(app);
+require("./routes/country.routes")(app);
 require("./routes/function.routes")(app);
 require("./routes/skill.routes")(app);
 require('./routes/project.routes')(app);

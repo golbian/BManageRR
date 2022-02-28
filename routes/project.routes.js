@@ -40,6 +40,13 @@ module.exports = (app) => {
     projects.findAllPmForTimesheet
   );
 
+    //Retrieve all Admin's projects for timesheet
+    router.get(
+      "/timesheet/admin",
+      [authJwt.verifyToken, authJwt.isAdmin],
+      projects.findAllAdminForTimesheet
+    );
+
   //Retrieve all Kam's projects for timesheet
   router.get(
     "/timesheet/kam/:kam",
