@@ -155,11 +155,13 @@ exports.upload = (req, res) => {
               // console.log(parent)
               pushToProject(parent, data, false);
             } else if (data.nestedLevel !== 0 && data.level === "TASK") {
+              data._id = uuidv4();
               data.type = "task";
               var parent = parts[0] + "." + parts[1];
               data.wp = false;
               pushToProject(parent, data, true);
             } else if (data.nestedLevel !== 0 && data.level === "DEL") {
+              data._id = uuidv4();
               data.type = "milestone";
               data.wp = false;
               var parent = parts[0] + "." + parts[1];
