@@ -1,26 +1,7 @@
 const db = require("../models");
 const mongoose = require("mongoose");
+const { project } = require("../models");
 const Project = db.project;
-
-var getName = function (search) {
-  return search == undefined
-    ? ""
-    : search == "undefined"
-    ? ""
-    : search == ""
-    ? ""
-    : new RegExp(search, "i");
-};
-
-var getClient = function (client) {
-  return client == undefined
-    ? ""
-    : client == "undefined"
-    ? ""
-    : client == ""
-    ? ""
-    : new RegExp(client, "i");
-};
 
 // Create and Save a new Project
 exports.create = (req, res) => {
@@ -79,6 +60,8 @@ exports.create = (req, res) => {
     jalon: req.body.jalon,
     debours: req.body.debours,
     tpelig: req.body.tpelig,
+    // $level: req.body.$level,
+    // open: req.body.open
   });
   console.log(project);
 
@@ -99,19 +82,7 @@ exports.create = (req, res) => {
 
 // Retrieve all Projects from the database.
 exports.findAll = (req, res) => {
-  // if(getName(req.query.search) === "" && getClient(req.query.client) === "") {
-  //   var aggregation = [
-  //     { $addFields: { total: { $sum: "$tasks.charge" } } },
-  //     { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value)} }
-  //   ]
-  // } else {
   var aggregation = [
-    {
-      $match: {
-        name: { $regex: getName(req.query.search) },
-        client: { $regex: getClient(req.query.client) },
-      },
-    },
     {
       $addFields: {
         total: {
@@ -125,7 +96,7 @@ exports.findAll = (req, res) => {
         "tasks.pm": "$$ROOT.pm",
       },
     },
-    { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value) } },
+    { $sort: { name: 1 } },
   ];
   // }
 
@@ -134,7 +105,7 @@ exports.findAll = (req, res) => {
       Project.populate(
         doc,
         {
-          path: "tasks.links",
+          path: "links",
           // populate: { path: 'links', model:"link" }
         },
         function (err, data) {
@@ -169,6 +140,27 @@ exports.findAll = (req, res) => {
   //     // })
   // // });
 };
+
+// Retrieve all Projects from the database.
+// exports.findAllChilds = (req, res) => {
+//   let ids = req.body.ids;
+//   Project.find({ _id: { $in: ids } })
+//     .then((data) => {
+//       if (!data)
+//         res.status(404).send({ message: "Project childs were not found "});
+//       else {
+//         let childs = [];
+//         for(project of data) {
+//           childs.push(project.tasks.flat());
+//         }
+//         console.log(childs)
+//         res.send(data);
+//       }
+//     })
+//     .catch((err) => {
+//       res.status(500).send({ message: "Error retrieving Projects" });
+//     });
+// };
 
 // Find a single Project with an id
 exports.findOne = (req, res) => {
@@ -255,8 +247,9 @@ exports.attachPM = (req, res) => {
 // Delete a Project with the specified id in the request
 exports.delete = (req, res) => {
   const id = req.params.id;
+  console.log(id);
 
-  Project.findOneAndDelete({ _id: id }, { useFindAndModify: false })
+  Project.deleteOne({ _id: id })
     .then((data) => {
       if (!data) {
         res.status(404).send({
@@ -313,19 +306,22 @@ exports.findAllPublished = (req, res) => {
 exports.findAllAdminForTimesheet = (req, res) => {
   var aggregation = [
     {
-      '$match': {
-        '$or': [
+      $match: {
+        $or: [
           {
-            'stage': '8. COMMANDE'
-          }, {
-            'stage': '9. EN COURS'
-          }, {
-            'tasks.$.stage': '8. COMMANDE'
-          }, {
-            'tasks.$.stage': '9. EN COURS'
-          }
-        ]
-      }
+            stage: "8. COMMANDE",
+          },
+          {
+            stage: "9. EN COURS",
+          },
+          {
+            "tasks.$.stage": "8. COMMANDE",
+          },
+          {
+            "tasks.$.stage": "9. EN COURS",
+          },
+        ],
+      },
     },
     {
       $addFields: {
@@ -458,35 +454,21 @@ exports.findAllUsersForTimesheet = (req, res) => {
 
 exports.findAllPmProject = (req, res) => {
   const pm = req.params.pm;
-  if (getName(req.query.search) === "" && getClient(req.query.client) === "") {
-    var aggregation = [
-      { $match: { $or: [{ pm: pm }, { "tasks.pm": pm }] } },
-      { $addFields: { total: { $sum: "$tasks.charge" } } },
-      { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value) } },
-    ];
-  } else {
-    var aggregation = [
-      {
-        $match: {
-          pm: pm,
-          name: { $regex: getName(req.query.search) },
-          client: { $regex: getClient(req.query.client) },
-        },
+  var aggregation = [
+    { $match: { $or: [{ pm: pm }, { "tasks.pm": pm }] } },
+    {
+      $addFields: {
+        total: { $sum: "$tasks.charge" },
+        "tasks.root": "$$ROOT._id",
+        "tasks.client": "$$ROOT.client",
       },
-      {
-        $addFields: {
-          total: { $sum: "$tasks.charge" },
-          "tasks.root": "$$ROOT._id",
-          "tasks.client": "$$ROOT.client",
-        },
-      },
-      { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value) } },
-    ];
-  }
+    },
+    { $sort: { name: 1 } },
+  ];
 
   Project.find()
     .populate({
-      path: "tasks.links",
+      path: "links",
       // populate: { path: 'links', model:"link" }
     })
     .then(() => {
@@ -511,35 +493,21 @@ exports.findAllPmProject = (req, res) => {
 
 exports.findAllKamProject = (req, res) => {
   const kam = req.params.kam;
-  if (getName(req.query.search) === "" && getClient(req.query.client) === "") {
-    var aggregation = [
-      { $match: { kam: kam } },
-      { $addFields: { total: { $sum: "$tasks.charge" } } },
-      { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value) } },
-    ];
-  } else {
-    var aggregation = [
-      {
-        $match: {
-          kam: kam,
-          name: { $regex: getName(req.query.search) },
-          client: { $regex: getClient(req.query.client) },
-        },
+  var aggregation = [
+    { $match: { kam: kam } },
+    {
+      $addFields: {
+        total: { $sum: "$tasks.charge" },
+        "tasks.root": "$$ROOT._id",
+        "tasks.client": "$$ROOT.client",
       },
-      {
-        $addFields: {
-          total: { $sum: "$tasks.charge" },
-          "tasks.root": "$$ROOT._id",
-          "tasks.client": "$$ROOT.client",
-        },
-      },
-      { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value) } },
-    ];
-  }
+    },
+    { $sort: { name: 1 } },
+  ];
 
   Project.find()
     .populate({
-      path: "tasks.links",
+      path: "links",
       // populate: { path: 'links', model:"link" }
     })
     .then(() => {
@@ -564,33 +532,21 @@ exports.findAllKamProject = (req, res) => {
 
 exports.findAllResourceProject = (req, res) => {
   const resource = req.params.resource;
-  if (getName(req.query.search) === "" && getClient(req.query.client) === "") {
-    var aggregation = [
-      { $match: { "tasks.resources._id": resource } },
-      { $addFields: { total: { $sum: "$tasks.charge" } } },
-      { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value) } },
-    ];
-  } else {
-    var aggregation = [
-      {
-        $match: {
-          "tasks.resources._id": resource,
-          name: { $regex: getName(req.query.search) },
-        },
+  var aggregation = [
+    { $match: { "tasks.resources._id": resource } },
+    {
+      $addFields: {
+        total: { $sum: "$tasks.charge" },
+        "tasks.root": "$$ROOT._id",
+        "tasks.client": "$$ROOT.client",
       },
-      {
-        $addFields: {
-          total: { $sum: "$tasks.charge" },
-          "tasks.root": "$$ROOT._id",
-          "tasks.client": "$$ROOT.client",
-        },
-      },
-      { $sort: { [req.query.sort_type]: parseInt(req.query.sort_value) } },
-    ];
-  }
+    },
+    { $sort: { name: 1 } },
+  ];
+
   Project.find()
     .populate({
-      path: "tasks.links",
+      path: "links",
       // populate: { path: 'links', model:"link" }
     })
     .then(() => {

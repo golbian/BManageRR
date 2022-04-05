@@ -7,7 +7,10 @@ module.exports = (app) => {
   router.post("/", [authJwt.verifyToken, authJwt.isPm], projects.create);
 
   // Retrieve all Projects
-  router.get("/", [authJwt.verifyToken, authJwt.isPm], projects.findAll);
+  router.get("/", [authJwt.verifyToken, authJwt.isAdmin], projects.findAll);
+
+  // Retrieve all Projects Childs
+  // router.post("/childs", [authJwt.verifyToken], projects.findAllChilds);
 
   // Retrieve all published Projects
   router.get("/published", [authJwt.verifyToken], projects.findAllPublished);
@@ -40,12 +43,12 @@ module.exports = (app) => {
     projects.findAllPmForTimesheet
   );
 
-    //Retrieve all Admin's projects for timesheet
-    router.get(
-      "/timesheet/admin",
-      [authJwt.verifyToken, authJwt.isAdmin],
-      projects.findAllAdminForTimesheet
-    );
+  //Retrieve all Admin's projects for timesheet
+  router.get(
+    "/timesheet/admin",
+    [authJwt.verifyToken, authJwt.isAdmin],
+    projects.findAllAdminForTimesheet
+  );
 
   //Retrieve all Kam's projects for timesheet
   router.get(

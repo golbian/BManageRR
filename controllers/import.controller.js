@@ -177,21 +177,49 @@ exports.upload = (req, res) => {
         } else {
           project.charge = 0;
         }
-        if (project.charge === null || NaN) {
+        if (project.charge === null || NaN || "" || "NaN") {
           project.charge = 0;
         }
-        for (const schedule of project.tasks) {
-          if (schedule) {
-            if (schedule.charge !== "TBD" || schedule.charge !== "") {
-              schedule.charge = parseInt(schedule.charge);
-            } else {
-              schedule.charge = 0;
-            }
-            if (schedule.charge === null || NaN) {
-              schedule.charge = 0;
-            }
-          }
+
+        if (project.etp !== "TBD" || project.etp !== "") {
+          project.etp = parseInt(project.etp);
+        } else {
+          project.etp = 0;
         }
+        if (project.etp === null || NaN || "" || "NaN") {
+          project.etp = 0;
+        }
+
+        if (project.duration !== "TBD" || project.duration !== "") {
+          project.duration = parseInt(project.duration);
+        } else {
+          project.duration = 0;
+        }
+        if (project.duration === null || NaN || "" || "NaN") {
+          project.duration = 0;
+        }
+
+        if (project.rate !== "TBD" || project.duration !== "") {
+          project.rate = parseInt(project.rate);
+        } else {
+          project.rate = 0;
+        }
+        if (project.rate === null || NaN || "" || "NaN") {
+          project.rate = 0;
+        }
+        
+        // for (const schedule of project.tasks) {
+        //   if (schedule) {
+        //     if (schedule.charge !== "TBD" || schedule.charge !== "") {
+        //       schedule.charge = parseInt(schedule.charge);
+        //     } else {
+        //       schedule.charge = 0;
+        //     }
+        //     if (schedule.charge === null || NaN) {
+        //       schedule.charge = 0;
+        //     }
+        //   }
+        // }
 
         // Client.findOne({name:project.client}).then(response => {
         //   project.client = response.name;

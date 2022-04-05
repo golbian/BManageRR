@@ -1,7 +1,7 @@
 const dbConfig = require("../config/db.config.js");
 const mongoose = require("mongoose");
 
-// mongoose.set('debug', true);
+mongoose.set('debug', true);
 
 mongoose.Promise = global.Promise;
 
@@ -20,6 +20,6 @@ db.project = require("./project.model.js")(mongoose);
 db.link = require("./link.model.js")(mongoose);
 db.event = require("./event.model.js")(mongoose);
 
-db.ROLES = ["user", "admin", "moderator"];
+db.ROLES = ["user", "admin", "kam", "pm"];
 
 module.exports = db;

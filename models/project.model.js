@@ -1,11 +1,12 @@
 module.exports = (mongoose) => {
-
   var taskSchema = mongoose.Schema({
     _id: String,
     wbs: String,
     type: String,
     wp: Boolean,
     name: String,
+    open: Boolean,
+    $level: Number,
     // client: {
     //   type: mongoose.Schema.Types.ObjectId,
     //   ref: "client"
@@ -65,16 +66,15 @@ module.exports = (mongoose) => {
 
   var projectSchema = mongoose.Schema(
     {
-      _id: {
-        type: String,
-        unique: true 
-      },
+      _id: String,
       wbs: String,
       type: String,
       level: String,
       wp: Boolean,
       name: String,
       nestedLevel: Number,
+      open: Boolean,
+      $level: Number,
       // client: {
       //   type: mongoose.Schema.Types.ObjectId,
       //   ref: "client"
@@ -111,10 +111,10 @@ module.exports = (mongoose) => {
       regt_initial: mongoose.Schema.Types.Mixed,
       regt_expect: mongoose.Schema.Types.Mixed,
       regt_final: mongoose.Schema.Types.Mixed,
-      charge: mongoose.Schema.Types.Mixed,
-      rate: mongoose.Schema.Types.Mixed,
-      etp: mongoose.Schema.Types.Mixed,
-      ca: mongoose.Schema.Types.Mixed,
+      charge: Number,
+      rate: Number,
+      etp: Number,
+      ca: Number,
       debours: String,
       comments: String,
       status: String,
@@ -124,9 +124,15 @@ module.exports = (mongoose) => {
       parent: String,
       root: String,
       progress: Number,
-      duration: mongoose.Schema.Types.Mixed,
+      duration: Number,
       published: Boolean,
       tasks: [taskSchema],
+      links: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "link",
+        },
+      ],
     },
     { timestamps: true }
   );

@@ -1,7 +1,5 @@
 const db = require("../models");
-const mongoose = require("mongoose");
 const Project = db.project;
-const User = db.user;
 
 exports.create = async (req, res) => {
   if (!req.body) {
@@ -108,6 +106,8 @@ exports.update = (req, res) => {
       "tasks.$.jalon": req.body.jalon,
       "tasks.$.debours": req.body.debours,
       "tasks.$.tpelig": req.body.tpelig,
+      "tasks.$.$level": req.body.$level,
+      "tasks.$.open": req.body.open,
     },
     { useFindAndModify: false }
   )

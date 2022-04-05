@@ -1,6 +1,4 @@
 const db = require("../models");
-const mongoose = require("mongoose");
-var ObjectId = mongoose.Types.ObjectId;
 const Event = db.event;
 
 // Create and Save a new Event
@@ -39,6 +37,7 @@ exports.create = (req, res) => {
     insitu: req.body.insitu,
   });
 
+  console.log(event)
   // Save Event in the database
   event
     .save(event)
