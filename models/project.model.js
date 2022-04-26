@@ -73,7 +73,6 @@ module.exports = (mongoose) => {
       wp: Boolean,
       name: String,
       nestedLevel: Number,
-      open: Boolean,
       $level: Number,
       // client: {
       //   type: mongoose.Schema.Types.ObjectId,
